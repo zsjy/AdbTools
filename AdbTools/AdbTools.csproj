@@ -60,22 +60,23 @@
     <ApplicationIcon>ico.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>B42FB4C906BAD0467EE3BA6BE98412D149ACF77F</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>1B0D79BFE5D45799D0892F29742D83306C8BFE72</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>AdbTools_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>AdbTools.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>AdbTools_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>
@@ -134,7 +135,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="AdbTools.pfx" />
+    <None Include="AdbTools_TemporaryKey.pfx" />
     <None Include="App.config" />
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
