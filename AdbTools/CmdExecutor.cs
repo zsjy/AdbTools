@@ -37,7 +37,7 @@ namespace AdbTools
                 process.StartInfo.FileName = "cmd.exe";
                 process.StartInfo.UseShellExecute = true;
                 process.StartInfo.CreateNoWindow = false;
-                process.StartInfo.Arguments = $"/c {command}";
+                process.StartInfo.Arguments = $"/c \"{command}\"";
                 process.Start();
                 process.WaitForExit();
 
