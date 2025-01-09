@@ -28,12 +28,14 @@ namespace AdbTools
         private string adbPath = "";
         private DispatcherTimer timer;
         private ObservableCollection<string> deviceAddressHistory;
+        private ObservableCollection<string> deviceAddressList;
 
         public MainWindow()
         {
             InitializeComponent();
 
             deviceAddressHistory = new ObservableCollection<string>();
+            deviceAddressList = new ObservableCollection<string>();
         }
 
         private void refreshDeviceAddressHistory()
@@ -48,10 +50,10 @@ namespace AdbTools
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            //adb相关资源文件
             string path = AppDomain.CurrentDomain.BaseDirectory + "adb.exe";
             string adbDll1 = AppDomain.CurrentDomain.BaseDirectory + "AdbWinApi.dll";
             string adbDll2 = AppDomain.CurrentDomain.BaseDirectory + "AdbWinUsbApi.dll";
-
             if (!File.Exists(path) || !File.Exists(adbDll1) || !File.Exists(adbDll2))
             {
                 MessageBox.Show("adb工具集丢失，无法运行！", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -64,17 +66,19 @@ namespace AdbTools
             deviceAddress.ItemsSource = deviceAddressHistory;
             refreshDeviceAddressHistory();
 
+            deviceList.ItemsSource = deviceAddressList;
+
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(10); // 设置计时器的时间间隔为1秒
-            timer.Tick += Timer_Tick; // 订阅Tick事件
-            timer.Start(); // 启动计时器
+            timer.Interval = TimeSpan.FromSeconds(10);
+            timer.Tick += Timer_Tick; 
+            timer.Start(); 
 
             Timer_Tick(null, null);
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            deviceList.Items.Clear();
+            deviceAddressList.Clear();
             string content = CmdExecutor.ExecuteCommandAndReturn($"{adbPath} devices");
             // 定义正则表达式模式
             string pattern = @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+\b";
@@ -85,7 +89,7 @@ namespace AdbTools
             // 输出所有匹配项
             foreach (Match match in matches)
             {
-                deviceList.Items.Add(match.Value.Trim());
+                deviceAddressList.Add(match.Value.Trim());
             }
         }
 
@@ -172,7 +176,7 @@ namespace AdbTools
 
         private void disconnectAllDeviceItem_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBoxResult.OK == MessageBox.Show("请确定要断开所有设备吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            if (MessageBoxResult.OK == MessageBox.Show("确定要断开所有设备吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 CmdExecutor.ExecuteCommandAndQuit($"{adbPath} disconnect");
                 Timer_Tick(null, null);
@@ -218,23 +222,9 @@ namespace AdbTools
             return true;
         }
 
-        //private void deleteHistory_Click(object sender, RoutedEventArgs e)
-        //{
-        //    MenuItem menuItem = (MenuItem)sender;
-        //    ComboBoxItem comboBoxItem = (ComboBoxItem)menuItem.DataContext;
-        //    string selectedValue = comboBoxItem.Content.ToString();
-        //    if (MessageBoxResult.OK != MessageBox.Show($"确定要删除历史记录【{selectedValue}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-        //    {
-        //        return;
-        //    }
-        //    Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Remove(selectedValue);
-        //    Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
-        //    refreshDeviceAddressHistory();
-        //}
-
         private void deleteAllHistory_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBoxResult.OK == MessageBox.Show("请确定要清空所有历史纪录吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            if (MessageBoxResult.OK == MessageBox.Show("确定要清空所有历史纪录吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Clear();
                 Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
