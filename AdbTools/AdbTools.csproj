@@ -102,6 +102,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="CustomControl\HintComboBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControl\HintPasswordBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControl\HintTextBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControl\ProgressBarControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControl\RoundProcessBarLoading.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -111,6 +131,21 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="CmdExecutor.cs" />
+    <Compile Include="CustomControl\HintComboBox.xaml.cs">
+      <DependentUpon>HintComboBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControl\HintPasswordBox.xaml.cs">
+      <DependentUpon>HintPasswordBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControl\HintTextBox.xaml.cs">
+      <DependentUpon>HintTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControl\ProgressBarControl.xaml.cs">
+      <DependentUpon>ProgressBarControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControl\RoundProcessBarLoading.xaml.cs">
+      <DependentUpon>RoundProcessBarLoading.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Globals.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="AdbTools.CustomControl.HintComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="300" Loaded="UserControl_Loaded">
+    <Grid x:Name="grid" Margin="0,0,0,0">
+        <ComboBox x:Name="comboBox" Width="{Binding ElementName=grid, Path=ActualWidth}" Height="{Binding ElementName=grid, Path=ActualHeight}"  Foreground="#FF2F99FB" Background="{x:Null}" IsReadOnly="true"
+                  Padding="3,3,3,3" Margin="0,0,0,2" BorderThickness="0" SelectionChanged="comboBox_SelectionChanged" VerticalContentAlignment="Center" KeyUp="comboBox_KeyUp" IsEditable="True" KeyDown="comboBox_KeyDown"/>
+        <Label x:Name="hint" Content="" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#FF797A80" IsHitTestVisible="False" Background="{x:Null}" Margin="3,0,0,0"/>
+        <Line x:Name="line" X1="0" X2="{Binding ElementName=grid, Path=ActualWidth}" Y1="{Binding ElementName=comboBox, Path=ActualHeight}" Y2="{Binding ElementName=comboBox, Path=ActualHeight}"/>
+        <!--<Image x:Name="image" Width="20" Height="20" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center" />-->
+    </Grid>
+</UserControl>

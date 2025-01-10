@@ -26,7 +26,7 @@ namespace AdbTools
     public partial class MainWindow : Window
     {
         private string adbPath = "";
-        private DispatcherTimer timer;
+        //private DispatcherTimer timer;
         private ObservableCollection<string> deviceAddressHistory;
         private ObservableCollection<string> deviceAddressList;
 
@@ -68,34 +68,39 @@ namespace AdbTools
 
             deviceList.ItemsSource = deviceAddressList;
 
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(10);
-            timer.Tick += Timer_Tick;
-            timer.Start();
+            //timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromSeconds(10);
+            //timer.Tick += Timer_Tick;
+            //timer.Start();
 
             Timer_Tick(null, null);
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            waitAnimation(true);
             deviceAddressList.Clear();
-            string content = CmdExecutor.ExecuteCommandAndReturn($"{adbPath} devices");
-            // 定义正则表达式模式
-            string pattern = @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+\b";
-            // 创建 Regex 对象
-            Regex regex = new Regex(pattern);
-            // 查找所有匹配项
-            MatchCollection matches = regex.Matches(content);
-            // 输出所有匹配项
-            foreach (Match match in matches)
+            CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} devices", content =>
             {
-                deviceAddressList.Add(match.Value.Trim());
-            }
+                // 定义正则表达式模式
+                string pattern = @"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+\b";
+                // 创建 Regex 对象
+                Regex regex = new Regex(pattern);
+                // 查找所有匹配项
+                MatchCollection matches = regex.Matches(content);
+                // 输出所有匹配项
+                foreach (Match match in matches)
+                {
+                    deviceAddressList.Add(match.Value.Trim());
+                }
+
+                waitAnimation(false);
+            });
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            timer.Stop();
+            //timer.Stop();
         }
 
         private void connectDevice_Click(object sender, RoutedEventArgs e)
@@ -107,20 +112,28 @@ namespace AdbTools
                 return;
             }
 
-            string result = CmdExecutor.ExecuteCommandAndReturn($"{adbPath} connect {address}");
-            if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" }))
+            waitAnimation(true);
+            CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} connect {address}", result =>
             {
-                MessageBox.Show("设备连接失败！\r\n请检查IP和端口输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
-            if (!Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Contains(address))
-            {
-                Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Insert(0, address);
-                Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
-                refreshDeviceAddressHistory();
-            }
-            Timer_Tick(null, null);
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" }))
+                    {
+                        waitAnimation(false);
+                        MessageBox.Show("设备连接失败！\r\n请检查IP和端口输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
+                    if (!Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Contains(address))
+                    {
+                        Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Insert(0, address);
+                        Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
+                        refreshDeviceAddressHistory();
+                    }
+                    Timer_Tick(null, null);
+                    waitAnimation(false);
+                }));
+            });
         }
 
         private void pairDevice_Click(object sender, RoutedEventArgs e)
@@ -137,16 +150,20 @@ namespace AdbTools
                 MessageBox.Show("请输入配对码！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            string result = CmdExecutor.ExecuteCommandAndReturn(new string[] { $"{adbPath} pair {address}", code });
-            if (string.IsNullOrWhiteSpace(result) || !ContainsAny(result, new string[] { "Successfully" }))
+            waitAnimation(true);
+            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} pair {address}", code }, result =>
             {
-                MessageBox.Show("设备配对失败！\r\n请确认IP地址和端口是否处于配对状态并且配对码输入正确！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            if (ContainsAny(result, new string[] { "Successfully" }))
-            {
-                MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-            }
+                waitAnimation(false);
+                if (string.IsNullOrWhiteSpace(result) || !ContainsAny(result, new string[] { "Successfully" }))
+                {
+                    MessageBox.Show("设备配对失败！\r\n请确认IP地址和端口是否处于配对状态并且配对码输入正确！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                if (ContainsAny(result, new string[] { "Successfully" }))
+                {
+                    MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                }
+            });
         }
 
         private string SelectApkFile()
@@ -178,7 +195,20 @@ namespace AdbTools
             {
                 return;
             }
-            CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {textBlock.Text} install \"{path}\"");
+            waitAnimation(true);
+            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {textBlock.Text} install \"{path}\"" }, result =>
+            {
+                waitAnimation(false);
+                if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "adb: failed to install" }))
+                {
+                    MessageBox.Show("安装应用失败！\r\n请确认安卓设备是否允许安装应用！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                else
+                {
+                    MessageBox.Show("安装应用成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                }
+            });
         }
 
         private void disconnectDeviceItem_Click(object sender, RoutedEventArgs e)
@@ -190,16 +220,24 @@ namespace AdbTools
             {
                 return;
             }
-            CmdExecutor.ExecuteCommandAndReturn($"{adbPath} disconnect {textBlock.Text}");
-            Timer_Tick(null, null);
+            waitAnimation(true);
+            CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} disconnect {textBlock.Text}", result =>
+            {
+                Timer_Tick(null, null);
+                waitAnimation(false);
+            });
         }
 
         private void disconnectAllDeviceItem_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBoxResult.OK == MessageBox.Show("确定要断开所有设备吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
-                CmdExecutor.ExecuteCommandAndReturn($"{adbPath} disconnect");
-                Timer_Tick(null, null);
+                waitAnimation(true);
+                CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} disconnect", result =>
+                {
+                    Timer_Tick(null, null);
+                    waitAnimation(false);
+                });
             }
         }
 
@@ -271,5 +309,25 @@ namespace AdbTools
             return substrings.Any(substring => source.Contains(substring));
         }
 
+        private void waitAnimation(bool show)
+        {
+            if (show)
+            {
+                processBarGrid.Visibility = Visibility.Visible;
+                waitProcessBar.IsShowAnimation = show;
+            }
+            else
+            {
+                processBarGrid.Visibility = Visibility.Collapsed;
+                waitProcessBar.IsShowAnimation = show;
+            }
+        }
+
+        private void refreshList_Click(object sender, RoutedEventArgs e)
+        {
+            Timer_Tick(null, null);
+        }
+
+     
     }
 }

@@ -4,9 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows;
 
 namespace AdbTools
 {
+    public delegate void ExecuteResult(string result);
+
     public class CmdExecutor
     {
         public static string ExecuteCommandAndReturn(string command)
@@ -38,6 +41,49 @@ namespace AdbTools
             }
         }
 
+        public static void ExecuteCommandAndReturnAsync(string command)
+        {
+            ExecuteCommandAndReturnAsync(new string[] { command }, null);
+        }
+
+        public static void ExecuteCommandAndReturnAsync(string command, ExecuteResult executeResult)
+        {
+            ExecuteCommandAndReturnAsync(new string[] { command }, executeResult);
+        }
+
+        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult)
+        {
+            new Thread(() =>
+            {
+                using (Process process = new Process())
+                {
+                    process.StartInfo.FileName = "cmd.exe";
+                    process.StartInfo.RedirectStandardInput = true;
+                    process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.UseShellExecute = false;
+                    process.StartInfo.CreateNoWindow = true;
+
+                    process.Start();
+
+                    foreach (string com in command)
+                    {
+                        process.StandardInput.WriteLine(com);
+                        Thread.Sleep(150);
+                    }
+
+                    process.StandardInput.WriteLine("exit");
+
+                    string ret = process.StandardOutput.ReadToEnd();
+
+                    Application.Current.Dispatcher.Invoke(new Action(() =>
+                    {
+                        executeResult?.Invoke(ret);
+                    }));
+                }
+            }).Start();
+
+        }
+
         public static void ExecuteCommandByShell(string command)
         {
             using (Process process = new Process())
@@ -47,7 +93,7 @@ namespace AdbTools
                 process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.Arguments = $"/c \"{command}\"";
                 process.Start();
-      
+
             }
         }
 
