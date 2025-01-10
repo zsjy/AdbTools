@@ -43,15 +43,15 @@ namespace AdbTools
 
         public static void ExecuteCommandAndReturnAsync(string command)
         {
-            ExecuteCommandAndReturnAsync(new string[] { command }, null);
+            ExecuteCommandAndReturnAsync(new string[] { command }, null, null);
         }
 
         public static void ExecuteCommandAndReturnAsync(string command, ExecuteResult executeResult)
         {
-            ExecuteCommandAndReturnAsync(new string[] { command }, executeResult);
+            ExecuteCommandAndReturnAsync(new string[] { command }, executeResult, null);
         }
 
-        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult)
+        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult, ExecuteResult errorResult)
         {
             new Thread(() =>
             {
@@ -60,6 +60,7 @@ namespace AdbTools
                     process.StartInfo.FileName = "cmd.exe";
                     process.StartInfo.RedirectStandardInput = true;
                     process.StartInfo.RedirectStandardOutput = true;
+                    process.StartInfo.RedirectStandardError = true;
                     process.StartInfo.UseShellExecute = false;
                     process.StartInfo.CreateNoWindow = true;
 
@@ -74,9 +75,14 @@ namespace AdbTools
                     process.StandardInput.WriteLine("exit");
 
                     string ret = process.StandardOutput.ReadToEnd();
+                    string err = process.StandardError.ReadToEnd();
 
                     Application.Current.Dispatcher.Invoke(new Action(() =>
                     {
+                        if (!string.IsNullOrWhiteSpace(err))
+                        {
+                            errorResult?.Invoke(err);
+                        }
                         executeResult?.Invoke(ret);
                     }));
                 }

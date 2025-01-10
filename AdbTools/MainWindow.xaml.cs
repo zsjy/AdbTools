@@ -163,7 +163,7 @@ namespace AdbTools
                 {
                     MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 }
-            });
+            }, null);
         }
 
         private string SelectApkFile()
@@ -199,14 +199,17 @@ namespace AdbTools
             CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {textBlock.Text} install \"{path}\"" }, result =>
             {
                 waitAnimation(false);
-                if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "adb: failed to install" }))
-                {
-                    MessageBox.Show("安装应用失败！\r\n请确认安卓设备是否允许安装应用！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                else
+                if (!string.IsNullOrWhiteSpace(result) && ContainsAny(result, new string[] { "Success" }))
                 {
                     MessageBox.Show("安装应用成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                }
+            },
+            err =>
+            {
+                waitAnimation(false);
+                if (!string.IsNullOrWhiteSpace(err) && ContainsAny(err, new string[] { "adb: failed to install" }))
+                {
+                    MessageBox.Show("安装应用失败！\r\n请确认安卓设备是否允许安装应用！\r\n应用签名是否不符！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             });
         }
@@ -328,6 +331,5 @@ namespace AdbTools
             Timer_Tick(null, null);
         }
 
-     
     }
 }
