@@ -70,8 +70,8 @@ namespace AdbTools
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(10);
-            timer.Tick += Timer_Tick; 
-            timer.Start(); 
+            timer.Tick += Timer_Tick;
+            timer.Start();
 
             Timer_Tick(null, null);
         }
@@ -107,7 +107,12 @@ namespace AdbTools
                 return;
             }
 
-            CmdExecutor.ExecuteCommandAndQuit($"{adbPath} connect {address}");
+            string result = CmdExecutor.ExecuteCommandAndReturn($"{adbPath} connect {address}");
+            if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" }))
+            {
+                MessageBox.Show("设备连接失败！\r\n请检查IP和端口输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
             if (!Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Contains(address))
             {
@@ -121,12 +126,27 @@ namespace AdbTools
         private void pairDevice_Click(object sender, RoutedEventArgs e)
         {
             string address = deviceAddress.Text;
+            string code = pairCode.Text;
             if (!IsValidIPEndPoint(address))
             {
                 MessageBox.Show("设备配对地址输入错误！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            CmdExecutor.ExecuteCommandByShell($"{adbPath} pair {address}");
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                MessageBox.Show("请输入配对码！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            string result = CmdExecutor.ExecuteCommandAndReturn(new string[] { $"{adbPath} pair {address}", code });
+            if (string.IsNullOrWhiteSpace(result) || !ContainsAny(result, new string[] { "Successfully" }))
+            {
+                MessageBox.Show("设备配对失败！\r\n请确认IP地址和端口是否处于配对状态并且配对码输入正确！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (ContainsAny(result, new string[] { "Successfully" }))
+            {
+                MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            }
         }
 
         private string SelectApkFile()
@@ -170,7 +190,7 @@ namespace AdbTools
             {
                 return;
             }
-            CmdExecutor.ExecuteCommandAndQuit($"{adbPath} disconnect {textBlock.Text}");
+            CmdExecutor.ExecuteCommandAndReturn($"{adbPath} disconnect {textBlock.Text}");
             Timer_Tick(null, null);
         }
 
@@ -178,7 +198,7 @@ namespace AdbTools
         {
             if (MessageBoxResult.OK == MessageBox.Show("确定要断开所有设备吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
-                CmdExecutor.ExecuteCommandAndQuit($"{adbPath} disconnect");
+                CmdExecutor.ExecuteCommandAndReturn($"{adbPath} disconnect");
                 Timer_Tick(null, null);
             }
         }
@@ -222,6 +242,20 @@ namespace AdbTools
             return true;
         }
 
+        private void deleteHistory_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = (MenuItem)sender;
+            var contextMenu = (ContextMenu)menuItem.Parent;
+            var textBlock = (TextBlock)contextMenu.PlacementTarget;
+            if (MessageBoxResult.OK != MessageBox.Show($"确定要删除记录【{textBlock.Text}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            {
+                return;
+            }
+            Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Remove(textBlock.Text);
+            Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
+            refreshDeviceAddressHistory();
+        }
+
         private void deleteAllHistory_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBoxResult.OK == MessageBox.Show("确定要清空所有历史纪录吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
@@ -230,6 +264,11 @@ namespace AdbTools
                 Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
                 refreshDeviceAddressHistory();
             }
+        }
+
+        public bool ContainsAny(string source, params string[] substrings)
+        {
+            return substrings.Any(substring => source.Contains(substring));
         }
 
     }

@@ -7,37 +7,48 @@
         mc:Ignorable="d"
         Title="Adb无线连接工具" Height="450" Width="350" FontSize="16" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded">
     <Window.Resources>
-        <ContextMenu x:Key="ListBoxItemContextMenu">
-            <MenuItem x:Name="installApkItem" Header="安装应用" Click="installApkItem_Click" Cursor="Hand" />
-            <MenuItem x:Name="disconnectDeviceItem" Header="断开设备" Click="disconnectDeviceItem_Click"  Cursor="Hand"/>
-            <Separator/>
-            <MenuItem x:Name="disconnectAllDeviceItem" Header="断开所有设备" Click="disconnectAllDeviceItem_Click" Cursor="Hand" />
+        <ContextMenu x:Key="ListBoxItemContextMenu"  FontSize="16">
+            <MenuItem x:Name="installApkItem" Header="安装应用" Click="installApkItem_Click" Cursor="Hand"   Margin="0,2" />
+            <MenuItem x:Name="disconnectDeviceItem" Header="断开设备" Click="disconnectDeviceItem_Click"  Cursor="Hand" Margin="0,2"/>
+            <Separator  Margin="0,5"/>
+            <MenuItem x:Name="disconnectAllDeviceItem" Header="断开所有设备" Click="disconnectAllDeviceItem_Click" Cursor="Hand" Margin="0,2" />
+        </ContextMenu>
+        <ContextMenu x:Key="ComboBoxItemContextMenu" FontSize="16">
+            <MenuItem x:Name="deleteHistory" Header="删除记录" Cursor="Hand"  Margin="0,2" Click="deleteHistory_Click"/>
+            <Separator  Margin="0,5"/>
+            <MenuItem x:Name="deleteAllHistory" Header="清空所有记录" Click="deleteAllHistory_Click" Cursor="Hand"  Margin="0,2"/>
         </ContextMenu>
     </Window.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0" Grid.ColumnSpan="3">
-            <Label Content="已连接列表(每10秒自动刷新)" Margin="10,125,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
-            <ListBox x:Name="deviceList" Margin="10,160,10,10" ToolTip="右键连接的设备进行操作">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,0,10">
+            <Label Content="IP和端口" Margin="10,10,249,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+            <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文“:”连接IP和端口" Margin="100,10,10,0" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" ContextMenu="{StaticResource ComboBoxItemContextMenu}" Cursor="Hand" Margin="0,0,0,0"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <Label Content="配对码" Margin="10,50,249,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+            <TextBox x:Name="pairCode" Margin="100,50,10,0" Height="30" ToolTip="配对设备时输入配对码"  VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLength="10"/>
+            <Button x:Name="connectDevice" IsDefault="True" Content="连接设备" ToolTip="输入连接的IP和端口进行连接" Margin="10,90,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" Width="90" Click="connectDevice_Click" Cursor="Hand"/>
+            <Button x:Name="pairDevice" Content="配对设备" ToolTip="输入配对的IP和端口进行配对" Margin="0,90,10,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Right" Width="90" Click="pairDevice_Click" Cursor="Hand"/>
+           
+        </Grid>
+        
+        <Grid Grid.Row="1" Grid.ColumnSpan="3">
+            <Label Content="已连接列表(每10秒自动刷新)" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+            <ListBox x:Name="deviceList" Margin="10,40,10,10" ToolTip="右键连接的设备进行操作">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" ContextMenu="{StaticResource ListBoxItemContextMenu}" Cursor="Hand"/>
+                        <TextBlock Text="{Binding}" ContextMenu="{StaticResource ListBoxItemContextMenu}" Cursor="Hand" Margin="0,0,0,0" Width="auto"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-
-        <Grid Grid.Column="0" Grid.ColumnSpan="3">
-            <Label Content="指定连接设备的IP和端口" Margin="10,10,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
-            <ComboBox x:Name="deviceAddress" IsEditable="True" Margin="10,45,10,0" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-            <Button x:Name="connectDevice" Content="连接设备" ToolTip="输入连接的IP和端口进行连接" Margin="10,85,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" Width="90" Click="connectDevice_Click" Cursor="Hand"/>
-            <Button x:Name="deleteAllHistory" ToolTip="删除所有历史记录" Content="清空历史" Margin="0,85,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Center" Width="90" Click="deleteAllHistory_Click" Cursor="Hand"/>
-            <Button x:Name="pairDevice" Content="配对设备" ToolTip="输入配对的IP和端口进行配对" Margin="0,85,10,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Right" Width="90" Click="pairDevice_Click" Cursor="Hand"/>
-           
-        </Grid>
-
-
     </Grid>
 </Window>
