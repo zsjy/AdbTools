@@ -27,7 +27,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,0,10">
             <Label Content="IP和端口" Margin="10,10,249,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
-            <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文【:】连接IP和端口" Margin="100,10,10,0" IsSynchronizedWithCurrentItem="False" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" >
+            <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文【:】连接IP和端口" Margin="100,10,10,0" IsSynchronizedWithCurrentItem="False" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" >
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" ContextMenu="{StaticResource ComboBoxItemContextMenu}" Cursor="Hand" Margin="0,0,0,0"/>
@@ -36,8 +36,8 @@
             </ComboBox>
             <Label Content="配对码" Margin="10,50,249,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
             <TextBox x:Name="pairCode" Margin="100,50,10,0" Height="30" ToolTip="配对设备时输入配对码"  VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLength="10"/>
-            <Button x:Name="connectDevice" IsDefault="True" Content="连接设备" ToolTip="输入连接的IP和端口进行连接" Margin="10,90,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" Width="90" Click="connectDevice_Click" Cursor="Hand"/>
-            <Button x:Name="pairDevice" Content="配对设备" ToolTip="输入配对的IP和端口进行配对" Margin="0,90,10,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Right" Width="90" Click="pairDevice_Click" Cursor="Hand"/>
+            <Button x:Name="connectDevice" IsDefault="True" Content="连接设备" ToolTip="输入连接的IP和端口进行连接"  Foreground="White" Background="#FF2A9FFF"  Margin="10,90,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" Width="90" Click="connectDevice_Click" Cursor="Hand"/>
+            <Button x:Name="pairDevice" Content="配对设备" ToolTip="输入配对的IP和端口进行配对" Margin="0,90,10,0"  Foreground="White" Background="#FFE87D00"  VerticalAlignment="Top" Height="30" HorizontalAlignment="Right" Width="90" Click="pairDevice_Click" Cursor="Hand"/>
 
         </Grid>
 
@@ -50,7 +50,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button x:Name="refreshList" Content="刷新列表" ToolTip="刷新已连接列表" Margin="0,0,0,10" Width="90" Cursor="Hand" Height="30" VerticalAlignment="Bottom" Click="refreshList_Click"/>
+            <Button x:Name="refreshList" Content="刷新列表" ToolTip="刷新已连接列表" Margin="0,0,0,10" Width="90" Cursor="Hand" Height="30" VerticalAlignment="Bottom" Click="refreshList_Click" Foreground="White" BorderBrush="{x:Null}" Background="#FF06AB26"/>
         </Grid>
 
         <Grid Grid.RowSpan="2" Visibility="Collapsed" x:Name="processBarGrid" Background="#7F000000" >

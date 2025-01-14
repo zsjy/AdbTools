@@ -26,7 +26,6 @@ namespace AdbTools
     public partial class MainWindow : Window
     {
         private string adbPath = "";
-        //private DispatcherTimer timer;
         private ObservableCollection<string> deviceAddressHistory;
         private ObservableCollection<string> deviceAddressList;
 
@@ -68,10 +67,6 @@ namespace AdbTools
 
             deviceList.ItemsSource = deviceAddressList;
 
-            //timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromSeconds(10);
-            //timer.Tick += Timer_Tick;
-            //timer.Start();
 
             Timer_Tick(null, null);
         }
@@ -100,7 +95,6 @@ namespace AdbTools
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            //timer.Stop();
         }
 
         private void connectDevice_Click(object sender, RoutedEventArgs e)
@@ -115,24 +109,26 @@ namespace AdbTools
             waitAnimation(true);
             CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} connect {address}", result =>
             {
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" }))
-                    {
-                        waitAnimation(false);
-                        MessageBox.Show("设备连接失败！\r\n请检查IP和端口输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-                    Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
-                    if (!Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Contains(address))
-                    {
-                        Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Insert(0, address);
-                        Globals.AppSettings.DEVICE_ADDRESS_HISTORY = Globals.AppSettings.DEVICE_ADDRESS_HISTORY;
-                        refreshDeviceAddressHistory();
-                    }
-                    Timer_Tick(null, null);
-                    waitAnimation(false);
-                }));
+                _ = Application.Current.Dispatcher.Invoke(new Action(() =>
+                  {
+                      if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" }))
+                      {
+                          waitAnimation(false);
+                          MessageBox.Show("设备连接失败！\r\n请检查IP和端口输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                          return;
+                      }
+                      Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
+
+                      string ip = address.Split(':')[0];
+                      List<string> list = Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Where(item => !item.StartsWith(ip)).ToList();
+                      list.Insert(0, address);
+                      Globals.AppSettings.DEVICE_ADDRESS_HISTORY = list;
+                      refreshDeviceAddressHistory();
+                      deviceAddress.Text = Globals.AppSettings.LAST_DEVICE_ADDRESS;
+
+                      Timer_Tick(null, null);
+                      waitAnimation(false);
+                  }));
             });
         }
 

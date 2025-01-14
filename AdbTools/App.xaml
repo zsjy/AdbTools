@@ -4,6 +4,25 @@
              xmlns:local="clr-namespace:AdbTools"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+
+                <ResourceDictionary Source="resource/ControlStyle.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--所有button应用-->
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource UserButtonStyle}"/>
+
+            <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource UserMenuItemStyle}"/>
+
+            <!--<Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource UserComboBoxItem}"/>-->
+
+            <!--<Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource UserComboBox}"/>-->
+
+            <!--<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource UserTextBox}"/>-->
+
+        </ResourceDictionary>
+
     </Application.Resources>
 </Application>
