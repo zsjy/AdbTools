@@ -2802,8 +2802,8 @@ end
 <CreateCPEntry>1</CreateCPEntry>
 <RegKeyName>%ProductName%%ProductVer%</RegKeyName>
 <CPDesc>%ProductName%</CPDesc>
-<UseCustomCPIcon>0</UseCustomCPIcon>
-<CustCPIconFN/>
+<UseCustomCPIcon>1</UseCustomCPIcon>
+<CustCPIconFN>%TempLaunchFolder%\icon.ico</CustCPIconFN>
 <CustCPIconIndex>0</CustCPIconIndex>
 <CPSIPublisher>%CompanyName%</CPSIPublisher>
 <CPSIPublisherURL>%CompanyURL%</CPSIPublisherURL>
