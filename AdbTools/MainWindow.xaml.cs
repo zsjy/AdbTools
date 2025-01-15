@@ -111,10 +111,10 @@ namespace AdbTools
             {
                 _ = Application.Current.Dispatcher.Invoke(new Action(() =>
                   {
-                      if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" }))
+                      if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)" , "failed to connect" }))
                       {
                           waitAnimation(false);
-                          MessageBox.Show("设备连接失败！\r\n请检查IP和端口输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                          MessageBox.Show("设备连接失败！\r\n1.请检查IP和端口输入是否正确；\r\n2.设备与电脑是否完成配对。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                           return;
                       }
                       Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
@@ -152,7 +152,7 @@ namespace AdbTools
                 waitAnimation(false);
                 if (string.IsNullOrWhiteSpace(result) || !ContainsAny(result, new string[] { "Successfully" }))
                 {
-                    MessageBox.Show("设备配对失败！\r\n请确认IP地址和端口是否处于配对状态并且配对码输入正确！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("设备配对失败！\r\n1.确认IP地址和端口是否处于配对状态；\r\n2.配对码输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
                 if (ContainsAny(result, new string[] { "Successfully" }))
@@ -205,7 +205,7 @@ namespace AdbTools
                 waitAnimation(false);
                 if (!string.IsNullOrWhiteSpace(err) && ContainsAny(err, new string[] { "adb: failed to install" }))
                 {
-                    MessageBox.Show("安装应用失败！\r\n请确认安卓设备是否允许安装应用！\r\n应用签名是否不符！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("安装应用失败！\r\n1.请确认安卓设备是否允许安装应用；\r\n2.应用签名是否不符。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             });
         }
