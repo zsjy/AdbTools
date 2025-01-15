@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.34407.143
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdbTools", "AdbTools\AdbTools.csproj", "{D80557CC-6756-4A53-BE06-2A0B21224607}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AdbToolsSetup", "AdbToolsSetup\AdbToolsSetup.vdproj", "{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +21,6 @@ Global
 		{D80557CC-6756-4A53-BE06-2A0B21224607}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D80557CC-6756-4A53-BE06-2A0B21224607}.Release|x64.ActiveCfg = Release|x64
 		{D80557CC-6756-4A53-BE06-2A0B21224607}.Release|x64.Build.0 = Release|x64
-		{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}.Debug|Any CPU.ActiveCfg = Debug
-		{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}.Debug|x64.ActiveCfg = Debug
-		{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}.Debug|x64.Build.0 = Debug
-		{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}.Release|Any CPU.ActiveCfg = Release
-		{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}.Release|x64.ActiveCfg = Release
-		{6E05D886-DFC3-4654-8DE8-5B0B2AAF5C34}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
