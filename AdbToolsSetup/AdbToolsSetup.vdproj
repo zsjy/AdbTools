@@ -303,15 +303,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AdbTools"
-        "ProductCode" = "8:{26F387CA-DA68-4DD5-A08C-465A4AEF955B}"
-        "PackageCode" = "8:{30D079CD-9E7D-479C-BFEE-425F8B499639}"
+        "ProductCode" = "8:{D57337F5-E6E9-4574-AE78-51904A602196}"
+        "PackageCode" = "8:{C62B8206-0982-4303-8D51-196BE417AFAE}"
         "UpgradeCode" = "8:{ED551E94-3D01-4508-A2DB-614056113FD9}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:1.0.3"
         "Manufacturer" = "8:hc"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -933,7 +933,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_27FAF4DF0E2F43CCAC4FDAD915FD1462"
             {
-            "SourcePath" = "8:..\\AdbTools\\obj\\x64\\Release\\AdbTools.exe"
+            "SourcePath" = "8:..\\AdbTools\\obj\\x64\\Debug\\AdbTools.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_48590810D4264E01AF4208218750FE9E"
