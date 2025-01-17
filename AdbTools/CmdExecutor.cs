@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
 
 namespace AdbTools
 {
     public delegate void ExecuteResult(string result);
+    public delegate bool ExecuteErrResult(string err);
 
     public class CmdExecutor
     {
@@ -51,7 +49,7 @@ namespace AdbTools
             ExecuteCommandAndReturnAsync(new string[] { command }, executeResult, null);
         }
 
-        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult, ExecuteResult errorResult)
+        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult, ExecuteErrResult errorResult)
         {
             new Thread(() =>
             {
@@ -69,21 +67,30 @@ namespace AdbTools
                     foreach (string com in command)
                     {
                         process.StandardInput.WriteLine(com);
-                        Thread.Sleep(150);
+                        Thread.Sleep(500);
                     }
 
                     process.StandardInput.WriteLine("exit");
 
                     string ret = process.StandardOutput.ReadToEnd();
                     string err = process.StandardError.ReadToEnd();
+                    Console.WriteLine($"result : {ret}");
+                    Console.WriteLine($"err : {err}");
 
                     Application.Current.Dispatcher.Invoke(new Action(() =>
                     {
+                        bool dispose = false;
                         if (!string.IsNullOrWhiteSpace(err))
                         {
-                            errorResult?.Invoke(err);
+                            if (null != errorResult)
+                            {
+                                dispose = errorResult.Invoke(err);
+                            }
                         }
-                        executeResult?.Invoke(ret);
+                        if (!dispose)
+                        {
+                            executeResult?.Invoke(ret);
+                        }
                     }));
                 }
             }).Start();

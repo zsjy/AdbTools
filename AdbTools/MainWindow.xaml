@@ -11,6 +11,9 @@
             <MenuItem x:Name="installApkItem" Header="安装应用" Click="installApkItem_Click" Cursor="Hand"   Margin="0,2" />
             <MenuItem x:Name="disconnectDeviceItem" Header="断开设备" Click="disconnectDeviceItem_Click"  Cursor="Hand" Margin="0,2"/>
             <Separator  Margin="0,5"/>
+            <MenuItem x:Name="resetPXItem" Header="恢复默认分辨率" Cursor="Hand"   Margin="0,2" Click="resetPXItem_Click" />
+            <MenuItem x:Name="resetDPIItem" Header="恢复默认DPI" Cursor="Hand" Margin="0,2" Click="resetDPIItem_Click"/>
+            <Separator  Margin="0,5"/>
             <MenuItem x:Name="disconnectAllDeviceItem" Header="断开所有设备" Click="disconnectAllDeviceItem_Click" Cursor="Hand" Margin="0,2" />
         </ContextMenu>
         <ContextMenu x:Key="ComboBoxItemContextMenu" FontSize="16">
