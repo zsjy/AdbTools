@@ -16,31 +16,31 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0FD918CDFA2449A7A19912DFC7CD3CF5"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_27FAF4DF0E2F43CCAC4FDAD915FD1462"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_489748BF5F2E4BB39DA47CF9C1544059"
+        "MsmKey" = "8:_63F232D224C5455BBFA4D72E0DC75A79"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_8934D1769005422D9A5E125D56EF7359"
+        "MsmKey" = "8:_7DEF32D158994573AD225A7B47907131"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_8BAC885A95704189956B5B193B7809C9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AF7B6A6C69F843EF8F7F130222ACABDB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -147,29 +147,9 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0FD918CDFA2449A7A19912DFC7CD3CF5"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_63F232D224C5455BBFA4D72E0DC75A79"
             {
-            "SourcePath" = "8:..\\AdbTools\\AdbWinUsbApi.dll"
-            "TargetName" = "8:AdbWinUsbApi.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_48590810D4264E01AF4208218750FE9E"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_489748BF5F2E4BB39DA47CF9C1544059"
-            {
-            "SourcePath" = "8:..\\AdbTools\\adb.exe"
+            "SourcePath" = "8:..\\libs\\adb.exe"
             "TargetName" = "8:adb.exe"
             "Tag" = "8:"
             "Folder" = "8:_48590810D4264E01AF4208218750FE9E"
@@ -187,10 +167,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8934D1769005422D9A5E125D56EF7359"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7DEF32D158994573AD225A7B47907131"
             {
-            "SourcePath" = "8:..\\AdbTools\\AdbWinApi.dll"
-            "TargetName" = "8:AdbWinApi.dll"
+            "SourcePath" = "8:..\\libs\\AdbWinUsbApi.dll"
+            "TargetName" = "8:AdbWinUsbApi.dll"
             "Tag" = "8:"
             "Folder" = "8:_48590810D4264E01AF4208218750FE9E"
             "Condition" = "8:"
@@ -224,6 +204,26 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AF7B6A6C69F843EF8F7F130222ACABDB"
+            {
+            "SourcePath" = "8:..\\libs\\AdbWinApi.dll"
+            "TargetName" = "8:AdbWinApi.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_48590810D4264E01AF4208218750FE9E"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
@@ -304,7 +304,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AdbTools"
         "ProductCode" = "8:{26F387CA-DA68-4DD5-A08C-465A4AEF955B}"
-        "PackageCode" = "8:{09F1A18A-D65F-436A-9ECA-49A7C2231ECE}"
+        "PackageCode" = "8:{30D079CD-9E7D-479C-BFEE-425F8B499639}"
         "UpgradeCode" = "8:{ED551E94-3D01-4508-A2DB-614056113FD9}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -315,7 +315,7 @@
         "Manufacturer" = "8:hc"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Adb无线连接工具安装程序"
+        "Title" = "8:AdbTools"
         "Subject" = "8:"
         "ARPCONTACT" = "8:hc"
         "Keywords" = "8:"
@@ -426,7 +426,7 @@
         {
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_53D006320E364BAA84F5237B5F61EA42"
             {
-            "Name" = "8:Adb无线连接工具"
+            "Name" = "8:AdbTools"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
