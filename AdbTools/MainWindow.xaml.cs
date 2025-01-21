@@ -26,6 +26,10 @@ namespace AdbTools
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static RoutedCommand CommandF5 = new RoutedCommand();
+        public static RoutedCommand CommandF8 = new RoutedCommand();
+
+
         public static string adbPath = "";
         //private DispatcherTimer timer;
         private ObservableCollection<string> deviceAddressHistory;
@@ -37,6 +41,42 @@ namespace AdbTools
 
             deviceAddressHistory = new ObservableCollection<string>();
             deviceAddressList = new ObservableCollection<Device>();
+
+            // 创建 CommandBinding 并绑定到处理程序
+            CommandBinding commandF5Binding = new CommandBinding(
+                CommandF5,
+                CommandF5_Executed,
+                CommandF5_CanExecute);
+
+            CommandBinding commandF8Binding = new CommandBinding(
+                CommandF8,
+                CommandF8_Executed,
+                CommandF8_CanExecute);
+
+
+            this.CommandBindings.Add(commandF5Binding);
+            this.CommandBindings.Add(commandF8Binding);
+    
+        }
+
+        private void CommandF5_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Timer_Tick(null, null);
+        }
+
+        private void CommandF5_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true; // 始终可以执行
+        }
+
+        private void CommandF8_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            pairDevice_Click(null, null);
+        }
+
+        private void CommandF8_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true; // 始终可以执行
         }
 
         private void refreshDeviceAddressHistory()
@@ -184,7 +224,7 @@ namespace AdbTools
                 {
                     MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 }
-            }, null, 600);
+            }, null);
         }
 
         private string SelectApkFile()
@@ -233,7 +273,7 @@ namespace AdbTools
                     return true;
                 }
                 return false;
-            });
+            }, 600);
         }
 
         private void disconnectDeviceItem_Click(object sender, RoutedEventArgs e)
