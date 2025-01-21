@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -14,6 +15,11 @@ namespace AdbTools
     /// </summary>
     public partial class App : Application
     {
+        [DllImport("User32.dll")]
+        private static extern bool ShowWindowAsync(System.IntPtr hWnd, int cmdShow);
+        [DllImport("User32.dll")]
+        private static extern bool SetForegroundWindow(System.IntPtr hWnd);
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -23,6 +29,7 @@ namespace AdbTools
                 Process[] createMeetingProcess = Process.GetProcessesByName(current.ProcessName);
                 if (createMeetingProcess.Count() > 1)
                 {
+                    HandleRunningInstance(createMeetingProcess[0]);
                     ///退出当前新开进程，不走OnExit方法
                     Environment.Exit(0);
                     //Application.Current.Shutdown();
@@ -40,6 +47,11 @@ namespace AdbTools
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         }
 
+        private void HandleRunningInstance(Process instance)
+        {
+            ShowWindowAsync(instance.MainWindowHandle, 1);  //调用api函数，正常显示窗口
+            SetForegroundWindow(instance.MainWindowHandle); //将窗口放置最前端
+        }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {

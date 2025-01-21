@@ -46,10 +46,15 @@
 
         <Grid Grid.Row="1" Grid.ColumnSpan="3">
             <Label Content="已连接列表" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
-            <ListBox x:Name="deviceList" Margin="10,40,10,50" ToolTip="右键连接的设备进行操作">
+            <ListBox x:Name="deviceList" Margin="10,40,10,50" ToolTip="右键连接的设备进行操作" ItemsSource="{Binding}">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" ContextMenu="{StaticResource ListBoxItemContextMenu}" Cursor="Hand" Margin="0,0,0,0" Width="auto"/>
+                        <TextBlock Text="{Binding Path=ShowDeviceName, Mode=Default}" ContextMenu="{StaticResource ListBoxItemContextMenu}" Cursor="Hand" Margin="0,5" Width="310" TextWrapping="Wrap"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

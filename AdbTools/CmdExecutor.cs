@@ -10,34 +10,6 @@ namespace AdbTools
 
     public class CmdExecutor
     {
-        public static string ExecuteCommandAndReturn(string command)
-        {
-            return ExecuteCommandAndReturn(new string[] { command });
-        }
-
-        public static string ExecuteCommandAndReturn(string[] command)
-        {
-            using (Process process = new Process())
-            {
-                process.StartInfo.FileName = "cmd.exe";
-                process.StartInfo.RedirectStandardInput = true;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
-
-                process.Start();
-
-                foreach (string com in command)
-                {
-                    process.StandardInput.WriteLine(com);
-                    Thread.Sleep(150);
-                }
-
-                process.StandardInput.WriteLine("exit");
-
-                return process.StandardOutput.ReadToEnd();
-            }
-        }
 
         public static void ExecuteCommandAndReturnAsync(string command)
         {
@@ -49,7 +21,7 @@ namespace AdbTools
             ExecuteCommandAndReturnAsync(new string[] { command }, executeResult, null);
         }
 
-        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult, ExecuteErrResult errorResult)
+        public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult, ExecuteErrResult errorResult, int timeout = 5)
         {
             new Thread(() =>
             {
@@ -67,15 +39,21 @@ namespace AdbTools
                     foreach (string com in command)
                     {
                         process.StandardInput.WriteLine(com);
-                        Thread.Sleep(500);
+                        Thread.Sleep(50);
                     }
 
                     process.StandardInput.WriteLine("exit");
+                    process.StandardInput.Close();  // 关闭输入流
 
                     string ret = process.StandardOutput.ReadToEnd();
                     string err = process.StandardError.ReadToEnd();
                     Console.WriteLine($"result : {ret}");
                     Console.WriteLine($"err : {err}");
+
+                    if (!process.WaitForExit(timeout * 1000))  // 等待5秒
+                    {
+                        process.Kill();  // 强制终止进程
+                    }
 
                     Application.Current.Dispatcher.Invoke(new Action(() =>
                     {

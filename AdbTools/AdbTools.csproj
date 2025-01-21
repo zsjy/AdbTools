@@ -148,6 +148,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="bean\Device.cs" />
     <Compile Include="CmdExecutor.cs" />
     <Compile Include="CustomControl\HintComboBox.xaml.cs">
       <DependentUpon>HintComboBox.xaml</DependentUpon>

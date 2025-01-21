@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using AdbTools.bean;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,16 +26,17 @@ namespace AdbTools
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string adbPath = "";
+        public static string adbPath = "";
+        //private DispatcherTimer timer;
         private ObservableCollection<string> deviceAddressHistory;
-        private ObservableCollection<string> deviceAddressList;
+        private ObservableCollection<Device> deviceAddressList;
 
         public MainWindow()
         {
             InitializeComponent();
 
             deviceAddressHistory = new ObservableCollection<string>();
-            deviceAddressList = new ObservableCollection<string>();
+            deviceAddressList = new ObservableCollection<Device>();
         }
 
         private void refreshDeviceAddressHistory()
@@ -67,7 +69,10 @@ namespace AdbTools
 
             deviceList.ItemsSource = deviceAddressList;
 
-
+            //timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromSeconds(3);
+            //timer.Tick += Timer_Tick;
+            //timer.Start();
             Timer_Tick(null, null);
         }
 
@@ -76,7 +81,6 @@ namespace AdbTools
             waitAnimation(true);
             CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} devices", content =>
             {
-                deviceAddressList.Clear();
                 // 定义正则表达式模式
                 string pattern = @"(\d+\.\d+\.\d+\.\d+:\d+)\s+device";
                 // 创建 Regex 对象
@@ -84,9 +88,30 @@ namespace AdbTools
                 // 查找所有匹配项
                 MatchCollection matches = regex.Matches(content);
                 // 输出所有匹配项
+                int index = 0;
+                List<string> list = new List<string>();
                 foreach (Match match in matches)
                 {
-                    deviceAddressList.Add(match.Value.Replace("device", "").Trim());
+                    string address = match.Value.Replace("device", "").Trim();
+                    list.Add(address);
+                    if (!deviceAddressList.Any(o => o.DeviceMark.Equals(address)))
+                    {
+                        Device device = new Device()
+                        {
+                            IsWifiConnect = true,
+                            DeviceMark = address,
+                            ShowDeviceName = address
+                        };
+
+                        deviceAddressList.Insert(index, device);
+                        index++;
+                    }
+                }
+                List<Device> removeList = deviceAddressList.Where(o => !list.Contains(o.DeviceMark)).ToList();
+                removeList.ForEach(o => deviceAddressList.Remove(o));
+                foreach (Device d in deviceAddressList)
+                {
+                    d.Refresh();
                 }
 
                 waitAnimation(false);
@@ -159,7 +184,7 @@ namespace AdbTools
                 {
                     MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 }
-            }, null);
+            }, null, 600);
         }
 
         private string SelectApkFile()
@@ -179,10 +204,9 @@ namespace AdbTools
 
         private void installApkItem_Click(object sender, RoutedEventArgs e)
         {
-            var menuItem = (MenuItem)sender;
-            var contextMenu = (ContextMenu)menuItem.Parent;
-            var textBlock = (TextBlock)contextMenu.PlacementTarget;
-            if (MessageBoxResult.OK != MessageBox.Show($"确定要安装应用到设备【{textBlock.Text}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            if (MessageBoxResult.OK != MessageBox.Show($"确定要安装应用到设备【{device.ShowDeviceName}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 return;
             }
@@ -192,12 +216,12 @@ namespace AdbTools
                 return;
             }
             waitAnimation(true);
-            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {textBlock.Text} install \"{path}\"" }, result =>
+            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} install \"{path}\"" }, result =>
             {
                 waitAnimation(false);
                 if (!string.IsNullOrWhiteSpace(result) && ContainsAny(result, new string[] { "Success" }))
                 {
-                    MessageBox.Show("安装应用成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】安装应用成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 }
             },
             err =>
@@ -205,7 +229,7 @@ namespace AdbTools
                 waitAnimation(false);
                 if (!string.IsNullOrWhiteSpace(err) && ContainsAny(err, new string[] { "adb: failed to install", "device offline" }))
                 {
-                    MessageBox.Show($"设备【{textBlock.Text}】安装应用失败！\r\n1.请确认安卓设备是否允许安装应用；\r\n2.应用签名是否不符；\r\n3.检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】安装应用失败！\r\n1.请确认安卓设备是否允许安装应用；\r\n2.应用签名是否不符；\r\n3.检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return true;
                 }
                 return false;
@@ -214,15 +238,15 @@ namespace AdbTools
 
         private void disconnectDeviceItem_Click(object sender, RoutedEventArgs e)
         {
-            var menuItem = (MenuItem)sender;
-            var contextMenu = (ContextMenu)menuItem.Parent;
-            var textBlock = (TextBlock)contextMenu.PlacementTarget;
-            if (MessageBoxResult.OK != MessageBox.Show($"确定要断开设备【{textBlock.Text}】的连接吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+
+            if (MessageBoxResult.OK != MessageBox.Show($"确定要断开设备【{device.ShowDeviceName}】的连接吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 return;
             }
             waitAnimation(true);
-            CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} disconnect {textBlock.Text}", result =>
+            CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} disconnect {device.DeviceMark}", result =>
             {
                 Timer_Tick(null, null);
                 waitAnimation(false);
@@ -331,21 +355,20 @@ namespace AdbTools
 
         private void resetPXItem_Click(object sender, RoutedEventArgs e)
         {
-            var menuItem = (MenuItem)sender;
-            var contextMenu = (ContextMenu)menuItem.Parent;
-            var textBlock = (TextBlock)contextMenu.PlacementTarget;
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{textBlock.Text}】执行【恢复默认分辨率】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【恢复默认分辨率】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {textBlock.Text} shell wm size reset" }, result =>
+                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell wm size reset " }, result =>
                 {
                     waitAnimation(false);
-                    MessageBox.Show($"设备【{textBlock.Text}】恢复默认分辨率成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】恢复默认分辨率成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 },
                 err =>
                 {
                     waitAnimation(false);
-                    MessageBox.Show($"设备【{textBlock.Text}】恢复默认分辨率失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】恢复默认分辨率失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return true;
                 });
             }
@@ -353,21 +376,20 @@ namespace AdbTools
 
         private void resetDPIItem_Click(object sender, RoutedEventArgs e)
         {
-            var menuItem = (MenuItem)sender;
-            var contextMenu = (ContextMenu)menuItem.Parent;
-            var textBlock = (TextBlock)contextMenu.PlacementTarget;
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{textBlock.Text}】执行【恢复默认DPI】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【恢复默认DPI】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {textBlock.Text} shell wm density reset" }, result =>
+                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell wm density reset " }, result =>
                 {
                     waitAnimation(false);
-                    MessageBox.Show($"设备【{textBlock.Text}】恢复默认DPI成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】恢复默认DPI成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
                 },
                 err =>
                 {
                     waitAnimation(false);
-                    MessageBox.Show($"设备【{textBlock.Text}】恢复默认DPI失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】恢复默认DPI失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return true;
                 });
             }
