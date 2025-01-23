@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 
 namespace AdbTools.bean
 {
@@ -35,19 +36,34 @@ namespace AdbTools.bean
             set;
         }
 
-        private string _ShowDeviceName;
         public string ShowDeviceName
         {
-            get => _ShowDeviceName;
-            set
-            {
-                _ShowDeviceName = value;
-                OnPropertyChanged(string.Empty);
-            }
+            get;
+            set;
         }
+
+        public string ConnectWay
+        {
+            get;
+            set;
+        }
+
+        public Brush ConnectWayColor
+        {
+            get;
+            set;
+        }
+
+        public string DeviceInfo
+        {
+            get;
+            set;
+        }
+
 
         public void Refresh()
         {
+            UpdateShow();
             new Thread(() =>
             {
                 if (string.IsNullOrWhiteSpace(DeviceBrand))
@@ -101,9 +117,15 @@ namespace AdbTools.bean
             string s = "";
             s += DeviceBrand;
             s += (string.IsNullOrWhiteSpace(s) ? "" : " ") + DeviceModel;
+            DeviceInfo = s;
+            ConnectWay = IsWifiConnect ? "WiFi" : "USB";
+            ConnectWayColor = IsWifiConnect ? Brushes.Green : Brushes.Orange;
+
+            s += $" {ConnectWay}";
             s += string.IsNullOrWhiteSpace(s) ? $"{DeviceMark}" : $" ({DeviceMark})";
 
             ShowDeviceName = s;
+            OnPropertyChanged(string.Empty);
         }
 
 

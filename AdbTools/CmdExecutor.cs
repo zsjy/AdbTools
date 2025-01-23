@@ -21,6 +21,11 @@ namespace AdbTools
             ExecuteCommandAndReturnAsync(new string[] { command }, executeResult, null);
         }
 
+        public static void ExecuteCommandAndReturnAsync(string command, ExecuteResult executeResult, ExecuteErrResult errorResult)
+        {
+            ExecuteCommandAndReturnAsync(new string[] { command }, executeResult, errorResult);
+        }
+
         public static void ExecuteCommandAndReturnAsync(string[] command, ExecuteResult executeResult, ExecuteErrResult errorResult, int timeout = 5)
         {
             new Thread(() =>

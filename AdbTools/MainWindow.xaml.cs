@@ -56,7 +56,7 @@ namespace AdbTools
 
             this.CommandBindings.Add(commandF5Binding);
             this.CommandBindings.Add(commandF8Binding);
-    
+
         }
 
         private void CommandF5_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -119,34 +119,44 @@ namespace AdbTools
         private void Timer_Tick(object sender, EventArgs e)
         {
             waitAnimation(true);
-            CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} devices", content =>
+            string command = $"{adbPath} devices";
+            CmdExecutor.ExecuteCommandAndReturnAsync(command, content =>
             {
-                // 定义正则表达式模式
-                string pattern = @"(\d+\.\d+\.\d+\.\d+:\d+)\s+device";
-                // 创建 Regex 对象
-                Regex regex = new Regex(pattern);
-                // 查找所有匹配项
-                MatchCollection matches = regex.Matches(content);
                 // 输出所有匹配项
                 int index = 0;
                 List<string> list = new List<string>();
-                foreach (Match match in matches)
+                string[] str = content.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < str.Length; ++i)
                 {
-                    string address = match.Value.Replace("device", "").Trim();
-                    list.Add(address);
-                    if (!deviceAddressList.Any(o => o.DeviceMark.Equals(address)))
+                    if (str[i].EndsWith("device"))
                     {
-                        Device device = new Device()
+                        string address = str[i].Replace("device", "").Trim();
+                        list.Add(address);
+                        Device d = null;
+                        if (!deviceAddressList.Any(o =>
                         {
-                            IsWifiConnect = true,
-                            DeviceMark = address,
-                            ShowDeviceName = address
-                        };
+                            d = o;
+                            return o.DeviceMark.Equals(address);
+                        }))
+                        {
+                            Device device = new Device()
+                            {
+                                IsWifiConnect = IsValidIPEndPoint(address),
+                                DeviceMark = address,
+                                ShowDeviceName = address
+                            };
 
-                        deviceAddressList.Insert(index, device);
+                            deviceAddressList.Insert(index, device);
+                        }
+                        else
+                        {
+                            deviceAddressList.Remove(d);
+                            deviceAddressList.Insert(index, d);
+                        }
                         index++;
                     }
                 }
+
                 List<Device> removeList = deviceAddressList.Where(o => !list.Contains(o.DeviceMark)).ToList();
                 removeList.ForEach(o => deviceAddressList.Remove(o));
                 foreach (Device d in deviceAddressList)
@@ -165,6 +175,8 @@ namespace AdbTools
         private void connectDevice_Click(object sender, RoutedEventArgs e)
         {
             string address = deviceAddress.Text;
+            address = address.Replace("：", ":");
+            deviceAddress.Text = address;
             if (!IsValidIPEndPoint(address))
             {
                 MessageBox.Show("设备连接地址输入错误！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -174,32 +186,37 @@ namespace AdbTools
             waitAnimation(true);
             CmdExecutor.ExecuteCommandAndReturnAsync($"{adbPath} connect {address}", result =>
             {
-                _ = Application.Current.Dispatcher.Invoke(new Action(() =>
-                  {
-                      if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)", "failed to connect" }))
-                      {
-                          waitAnimation(false);
-                          MessageBox.Show("设备连接失败！\r\n1.请检查IP和端口输入是否正确；\r\n2.设备与电脑是否完成配对。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                          return;
-                      }
-                      Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
+                if (string.IsNullOrWhiteSpace(result) || ContainsAny(result, new string[] { "(10060)", "(10061)", "failed to connect" }))
+                {
+                    waitAnimation(false);
+                    MessageBox.Show("设备连接失败！\r\n1.请检查IP和端口输入是否正确；\r\n2.设备与电脑是否完成配对。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+                Globals.AppSettings.LAST_DEVICE_ADDRESS = $"{address}";
 
-                      string ip = address.Split(':')[0];
-                      List<string> list = Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Where(item => !item.StartsWith(ip)).ToList();
-                      list.Insert(0, address);
-                      Globals.AppSettings.DEVICE_ADDRESS_HISTORY = list;
-                      refreshDeviceAddressHistory();
-                      deviceAddress.Text = Globals.AppSettings.LAST_DEVICE_ADDRESS;
+                string ip = address.Split(':')[0];
+                List<string> list = Globals.AppSettings.DEVICE_ADDRESS_HISTORY.Where(item => !item.StartsWith(ip)).ToList();
+                list.Insert(0, address);
+                Globals.AppSettings.DEVICE_ADDRESS_HISTORY = list;
+                refreshDeviceAddressHistory();
+                deviceAddress.Text = Globals.AppSettings.LAST_DEVICE_ADDRESS;
 
-                      Timer_Tick(null, null);
-                      waitAnimation(false);
-                  }));
+                Timer_Tick(null, null);
+                waitAnimation(false);
+
+            }, (err) =>
+            {
+                waitAnimation(false);
+                MessageBox.Show("设备连接失败！\r\n1.请检查IP和端口输入是否正确；\r\n2.设备与电脑是否完成配对。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return true;
             });
         }
 
         private void pairDevice_Click(object sender, RoutedEventArgs e)
         {
             string address = deviceAddress.Text;
+            address = address.Replace("：", ":");
+            deviceAddress.Text = address;
             string code = pairCode.Text;
             if (!IsValidIPEndPoint(address))
             {
