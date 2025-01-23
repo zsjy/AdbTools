@@ -116,6 +116,11 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5.2 (x86 和 x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5.2"
+                    }
                 }
             }
         }
@@ -304,7 +309,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AdbTools"
         "ProductCode" = "8:{050780B1-DC5C-4775-B08D-C6921FF82DDD}"
-        "PackageCode" = "8:{4618B0E0-E726-4C05-9894-5EF50C65FE04}"
+        "PackageCode" = "8:{AD01EEA2-63FE-498B-A3CC-A5173E061E50}"
         "UpgradeCode" = "8:{ED551E94-3D01-4508-A2DB-614056113FD9}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -424,7 +429,7 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_53D006320E364BAA84F5237B5F61EA42"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_3647BF02F1804FF6B9C3776341073F2F"
             {
             "Name" = "8:Adb连接工具"
             "Arguments" = "8:"
@@ -933,7 +938,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_27FAF4DF0E2F43CCAC4FDAD915FD1462"
             {
-            "SourcePath" = "8:..\\AdbTools\\obj\\x64\\Debug\\AdbTools.exe"
+            "SourcePath" = "8:..\\AdbTools\\obj\\x64\\Release\\AdbTools.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_48590810D4264E01AF4208218750FE9E"
