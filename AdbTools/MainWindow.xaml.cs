@@ -325,6 +325,10 @@ namespace AdbTools
 
         public static bool IsValidIPEndPoint(string ipPort)
         {
+            if (ipPort.Contains("._adb-tls-connect._tcp"))
+            {
+                return true;
+            }
             string[] parts = ipPort.Split(':');
             if (parts.Length > 2)
             {
