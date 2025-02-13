@@ -455,5 +455,19 @@ namespace AdbTools
                 });
             }
         }
+
+        private void logcatItem_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {device.DeviceMark} logcat");
+        }
+
+        private void logcatDebugItem_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {device.DeviceMark} logcat -s DEBUG");
+        }
     }
 }
