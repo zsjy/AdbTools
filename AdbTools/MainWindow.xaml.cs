@@ -1,4 +1,5 @@
-﻿using AdbTools.bean;
+﻿using AdbTools.AccessInterface;
+using AdbTools.bean;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -91,6 +92,7 @@ namespace AdbTools
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            this.Title = $"{this.Title} V{App.Version}";
             //adb相关资源文件
             string path = AppDomain.CurrentDomain.BaseDirectory + "adb.exe";
             string adbDll1 = AppDomain.CurrentDomain.BaseDirectory + "AdbWinApi.dll";
@@ -101,6 +103,8 @@ namespace AdbTools
                 Environment.Exit(0);
                 return;
             }
+            RequestJson.UpdateCheck(this);
+
             adbPath = $"\"{path}\"";
 
             deviceAddress.Text = Globals.AppSettings.LAST_DEVICE_ADDRESS;

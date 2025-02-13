@@ -20,6 +20,7 @@ namespace AdbTools
         {
             private static string _LAST_DEVICE_ADDRESS = null;
             private static List<string> _DEVICE_ADDRESS_HISTORY = null;
+            private static string _GITHUB_PROXY = null;
             /// <summary>
             /// 
             /// </summary>
@@ -70,6 +71,35 @@ namespace AdbTools
                 {
                     UpdateAppConfig("DEVICE_ADDRESS_HISTORY", string.Join(",", value));
                     _DEVICE_ADDRESS_HISTORY = value;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public static string GITHUB_PROXY
+            {
+                get
+                {
+                    if (null == _GITHUB_PROXY)
+                    {
+                        string v = GetKeyVlaue("GITHUB_PROXY");
+                        if (!string.IsNullOrWhiteSpace(v))
+                        {
+                            _GITHUB_PROXY = v;
+
+                        }
+                    }
+                    if (null == _GITHUB_PROXY)
+                    {
+                        _GITHUB_PROXY = "https://ghfast.top/";
+                    }
+                    return _GITHUB_PROXY;
+                }
+                set
+                {
+                    UpdateAppConfig("GITHUB_PROXY", value);
+                    _GITHUB_PROXY = value;
                 }
             }
 

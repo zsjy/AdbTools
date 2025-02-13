@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdbTools", "AdbTools\AdbToo
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AdbToolsSetup", "AdbToolsSetup\AdbToolsSetup.vdproj", "{22559873-B825-4CCF-816B-F0C0BC1FBA06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Update", "Update\Update.csproj", "{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,14 @@ Global
 		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|Any CPU.Build.0 = Release
 		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|x64.ActiveCfg = Release
 		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|x64.Build.0 = Release
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|x64.Build.0 = Debug|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Release|x64.ActiveCfg = Release|Any CPU
+		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace AdbTools
+namespace Update
 {
     /// <summary>
     /// App.xaml 的交互逻辑
@@ -21,13 +21,23 @@ namespace AdbTools
         [DllImport("User32.dll")]
         private static extern bool SetForegroundWindow(System.IntPtr hWnd);
 
-        public static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+        public static string downloadUrl;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             try
             {
+                if (e.Args.Count() == 0)
+                {
+                    ///退出当前新开进程，不走OnExit方法
+                    Environment.Exit(0);
+                    //Application.Current.Shutdown();
+                    return;
+                }
+
+                downloadUrl = e.Args[0];
+
                 Process current = Process.GetCurrentProcess();
                 Process[] createMeetingProcess = Process.GetProcessesByName(current.ProcessName);
                 if (createMeetingProcess.Count() > 1)
