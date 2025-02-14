@@ -67,7 +67,7 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Cursor="Hand" Width="310" Margin="0,5" ContextMenu="{StaticResource ListBoxItemContextMenu}">
+                        <Grid Cursor="Hand" Width="300" Margin="0,5" ContextMenu="{StaticResource ListBoxItemContextMenu}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="50"/>
