@@ -17,5 +17,10 @@ namespace AdbTools.bean
         /// </summary>
         public List<GithubReleasesAssets> Assets { get; set; }
 
+        /// <summary>
+        /// 发布的说明，Markdown
+        /// </summary>
+        public string Body { get; set; }
+
     }
 }
