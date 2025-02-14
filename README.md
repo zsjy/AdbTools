@@ -1,7 +1,7 @@
 ### 开发环境
 > 使用VS2019开发
 > 
-> 依赖`.NET4.6`
+> 依赖[.NET4.6下载](https://www.microsoft.com/zh-cn/download/details.aspx?id=48137)
 
 ### 运行环境
 - 需要`.NET4.6`运行时环境；
