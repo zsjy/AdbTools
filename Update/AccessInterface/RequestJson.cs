@@ -9,8 +9,8 @@ namespace Update.AccessInterface
     /// </summary>
     public static class RequestJson
     {
-   
-        public static void DownloadFile(string url, string savePath)
+
+        public static bool DownloadFile(string url, string savePath)
         {
             try
             {
@@ -34,7 +34,7 @@ namespace Update.AccessInterface
                     }
                 }
 
-                Console.WriteLine($"File downloaded and saved to: {savePath}");
+                return true;
             }
             catch (WebException ex)
             {
@@ -48,10 +48,12 @@ namespace Update.AccessInterface
                         Console.WriteLine($"Error details: {errorText}");
                     }
                 }
+                return false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
+                return false;
             }
         }
 

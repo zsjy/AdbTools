@@ -83,12 +83,7 @@ namespace AdbTools
                 {
                     if (null == _GITHUB_PROXY)
                     {
-                        string v = GetKeyVlaue("GITHUB_PROXY");
-                        if (!string.IsNullOrWhiteSpace(v))
-                        {
-                            _GITHUB_PROXY = v;
-
-                        }
+                        _GITHUB_PROXY = GetKeyVlaue("GITHUB_PROXY");
                     }
                     if (null == _GITHUB_PROXY)
                     {
@@ -100,6 +95,18 @@ namespace AdbTools
                 {
                     UpdateAppConfig("GITHUB_PROXY", value);
                     _GITHUB_PROXY = value;
+                }
+            }
+
+            /// <summary>
+            /// 
+            /// </summary>
+            public static bool IS_GITHUB_PROXY
+            {
+                get
+                {
+                    string v = GetKeyVlaue("GITHUB_PROXY");
+                    return null != v;
                 }
             }
 

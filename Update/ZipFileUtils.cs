@@ -10,7 +10,7 @@ namespace Update
 {
     public class ZipFileUtils
     {
-        public void UnzipFile(string zipFilePath, string extractPath)
+        public static bool UnzipFile(string zipFilePath, string extractPath)
         {
             try
             {
@@ -26,14 +26,38 @@ namespace Update
                     Directory.CreateDirectory(extractPath);
                 }
 
-                // 解压 ZIP 文件
-                ZipFile.ExtractToDirectory(zipFilePath, extractPath);
+                // 打开 ZIP 文件
+                using (ZipArchive archive = ZipFile.OpenRead(zipFilePath))
+                {
+                    foreach (ZipArchiveEntry entry in archive.Entries)
+                    {
+                        string fullPath = Path.Combine(extractPath, entry.FullName);
 
-                Console.WriteLine($"ZIP file extracted to: {extractPath}");
+                        // 如果是目录，则创建目录
+                        if (string.IsNullOrEmpty(entry.Name))
+                        {
+                            Directory.CreateDirectory(fullPath);
+                        }
+                        else
+                        {
+                            // 如果是文件，检查是否已存在
+                            if (File.Exists(fullPath))
+                            {
+                                File.Delete(fullPath); // 删除已存在的文件
+                            }
+
+                            // 解压文件
+                            entry.ExtractToFile(fullPath);
+                        }
+                    }
+                }
+
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error extracting ZIP file: {ex.Message}");
+                throw ex;
             }
         }
 

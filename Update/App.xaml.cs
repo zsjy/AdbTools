@@ -22,21 +22,26 @@ namespace Update
         private static extern bool SetForegroundWindow(System.IntPtr hWnd);
 
         public static string downloadUrl;
+        public static string unZipPath;
+        public static string startExePath;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
             try
             {
-                if (e.Args.Count() == 0)
+                if (e.Args.Count() < 2)
                 {
                     ///退出当前新开进程，不走OnExit方法
                     Environment.Exit(0);
                     //Application.Current.Shutdown();
                     return;
                 }
-
                 downloadUrl = e.Args[0];
+                unZipPath = e.Args[1];
+                if (e.Args.Count() > 2) {
+                    startExePath = e.Args[2];
+                }
 
                 Process current = Process.GetCurrentProcess();
                 Process[] createMeetingProcess = Process.GetProcessesByName(current.ProcessName);

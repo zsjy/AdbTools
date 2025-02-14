@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
@@ -90,6 +91,32 @@ namespace AdbTools
                 process.StartInfo.Arguments = $"/c \"{command}\"";
                 process.Start();
 
+            }
+        }
+
+        public static void StartExe(string exePath, List<string> cmdArges)
+        {
+            string args = "";
+            foreach (string a in cmdArges)
+            {
+                args += a + " ";
+            }
+            // 创建ProcessStartInfo对象
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = exePath,
+                Arguments = args,
+                UseShellExecute = true // 使用操作系统shell启动
+            };
+
+            try
+            {
+                // 启动外部程序
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("启动程序时出错: " + ex.Message);
             }
         }
 

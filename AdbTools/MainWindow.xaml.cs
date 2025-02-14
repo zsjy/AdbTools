@@ -103,6 +103,11 @@ namespace AdbTools
                 Environment.Exit(0);
                 return;
             }
+            if (!Globals.AppSettings.IS_GITHUB_PROXY)
+            {
+                Globals.AppSettings.GITHUB_PROXY = Globals.AppSettings.GITHUB_PROXY;
+            }
+
             RequestJson.UpdateCheck(this);
 
             adbPath = $"\"{path}\"";

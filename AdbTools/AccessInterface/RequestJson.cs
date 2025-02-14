@@ -50,8 +50,14 @@ namespace AdbTools.AccessInterface
                         return;
                     }
 
+                List<string> cmdArges = new List<string>();
+                cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
+                    cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}");
+                    cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}");
 
-
+                    CmdExecutor.StartExe($"{AppDomain.CurrentDomain.BaseDirectory}Update.exe", cmdArges);
+                    ///退出当前新开进程，不走OnExit方法
+                    Environment.Exit(0);
                 }));
             }));
             thread.Start();
