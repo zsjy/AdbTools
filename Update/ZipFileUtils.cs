@@ -51,6 +51,7 @@ namespace Update
                         }
                     }
                 }
+                File.Delete(zipFilePath);
 
                 return true;
             }
