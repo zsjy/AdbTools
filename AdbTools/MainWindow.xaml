@@ -59,7 +59,7 @@
 
         <Grid Grid.Row="1" Grid.ColumnSpan="3">
             <Label Content="连接列表" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
-            <ListBox x:Name="deviceList" Margin="10,40,10,50" ToolTip="右键连接的设备进行操作" ItemsSource="{Binding}" HorizontalContentAlignment="Center" TabIndex="4">
+            <ListBox x:Name="deviceList" Margin="10,40,10,50" ToolTip="右键连接的设备进行操作" ItemsSource="{Binding}" HorizontalContentAlignment="Center" TabIndex="4" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel Orientation="Vertical" />
@@ -86,6 +86,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <Button x:Name="refreshList" Content="刷新(F5)" ToolTip="刷新已连接列表" Margin="0,0,0,10" Width="110" Cursor="Hand" Height="30" VerticalAlignment="Bottom" Click="refreshList_Click" Foreground="White" BorderBrush="{x:Null}" Background="#FF06AB26" TabIndex="5"/>
+            <Image x:Name="updateVersion" Visibility="Collapsed" Source="/resource/imgs/new_version.png" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="30" Height="30" Margin="0,0,10,10" MouseDown="updateVersion_MouseDown" />
         </Grid>
 
         <Grid Grid.RowSpan="2" Visibility="Collapsed" x:Name="processBarGrid" Background="#7F000000" >

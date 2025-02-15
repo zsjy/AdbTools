@@ -108,7 +108,7 @@ namespace AdbTools
                 Globals.AppSettings.GITHUB_PROXY = Globals.AppSettings.GITHUB_PROXY;
             }
 
-            RequestJson.UpdateCheck(this);
+            RequestJson.UpdateCheck(this, updateVersion);
 
             adbPath = $"\"{path}\"";
 
@@ -477,6 +477,36 @@ namespace AdbTools
             int index = deviceList.SelectedIndex;
             Device device = deviceAddressList[index];
             CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {device.DeviceMark} logcat -s DEBUG");
+        }
+
+        private void updateVersion_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                GithubReleases githubReleases = (GithubReleases)updateVersion.Tag;
+                if (null == githubReleases) return;
+                GithubReleasesAssets githubReleasesAssets = null;
+                foreach (GithubReleasesAssets assets in githubReleases.Assets)
+                {
+                    if (RequestJson.UpdateFileName.Equals(assets.Name, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        githubReleasesAssets = assets;
+                    }
+                }
+                if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.Name}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+                {
+                    return;
+                }
+
+                List<string> cmdArges = new List<string>();
+                cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
+                cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}");
+                cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}");
+
+                CmdExecutor.StartExe($"{AppDomain.CurrentDomain.BaseDirectory}Update.exe", cmdArges);
+                ///退出当前新开进程，不走OnExit方法
+                Environment.Exit(0);
+            }
         }
     }
 }

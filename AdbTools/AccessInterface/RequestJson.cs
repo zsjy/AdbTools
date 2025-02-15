@@ -9,6 +9,7 @@ using AdbTools.bean;
 using System.Threading;
 using System.Windows;
 using System.IO;
+using System.Windows.Controls;
 
 namespace AdbTools.AccessInterface
 {
@@ -21,7 +22,7 @@ namespace AdbTools.AccessInterface
         public const string UpdateFileName = "update.zip";
         private static JavaScriptSerializer jss = new JavaScriptSerializer();
 
-        public static void UpdateCheck(MainWindow mainWindow)
+        public static void UpdateCheck(MainWindow mainWindow, Image updateVersion)
         {
             Thread thread = new Thread(new ThreadStart(() =>
             {
@@ -45,19 +46,8 @@ namespace AdbTools.AccessInterface
 
                 mainWindow.Dispatcher.Invoke(new Action(() =>
                 {
-                    if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.Name}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-                    {
-                        return;
-                    }
-
-                List<string> cmdArges = new List<string>();
-                cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
-                    cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}");
-                    cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}");
-
-                    CmdExecutor.StartExe($"{AppDomain.CurrentDomain.BaseDirectory}Update.exe", cmdArges);
-                    ///退出当前新开进程，不走OnExit方法
-                    Environment.Exit(0);
+                    updateVersion.Visibility = Visibility.Visible;
+                    updateVersion.Tag = githubReleases;
                 }));
             }));
             thread.Start();
