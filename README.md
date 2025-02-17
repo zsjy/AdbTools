@@ -13,6 +13,11 @@
 #### 安卓11及以上
 - `设置 - 系统 - 开发者选项`，找到`无线调试`功能，`连接WiFi`后点击`开启`，进入`无线调试`，查看`IP地址和端口`，使用此地址即可无线连接到设备。
 - **注：部分设备位置不同，需要自行寻找**
+<video width="400" height="510" controls>
+  <source src="./docs/videos/1.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 #### 安卓11以下
 - `连接WiFi`查看当前设备的`局域网IP地址`，使用此地址即可无线连接到设备，此时无需输入端口号。
 - **注：过低版本的设备可能无法连接**
