@@ -94,7 +94,7 @@ namespace AdbTools
             }
         }
 
-        public static void StartExe(string exePath, List<string> cmdArges)
+        public static bool StartExe(string exePath, List<string> cmdArges)
         {
             string args = "";
             foreach (string a in cmdArges)
@@ -113,10 +113,12 @@ namespace AdbTools
             {
                 // 启动外部程序
                 Process.Start(startInfo);
+                return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("启动程序时出错: " + ex.Message);
+                //MessageBox.Show("启动程序时出错: " + ex.Message);
+                return false;
             }
         }
 
