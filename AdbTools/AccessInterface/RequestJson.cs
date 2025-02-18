@@ -19,6 +19,8 @@ namespace AdbTools.AccessInterface
     public static class RequestJson
     {
         public const string ApiUrl = @"https://api.github.com/repos/zsjy/AdbTools/releases";
+        public const string ApiUrlMirror = @"https://code.hcjike.com/api/v1/repos/hcjike/AdbTools/releases";
+        
         public const string UpdateFileName = "update.zip";
         private static JavaScriptSerializer jss = new JavaScriptSerializer();
 
@@ -65,7 +67,7 @@ namespace AdbTools.AccessInterface
         {
             try
             {
-                string strURL = ApiUrl;
+                string strURL = ApiUrlMirror;
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(strURL);
                 request.UserAgent = "User-Agent:Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1";
                 request.ContentType = "application/x-www-form-urlencoded";

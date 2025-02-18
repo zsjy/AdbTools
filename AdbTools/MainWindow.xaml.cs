@@ -499,7 +499,8 @@ namespace AdbTools
                 }
 
                 List<string> cmdArges = new List<string>();
-                cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
+                //cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
+                cmdArges.Add($"{githubReleasesAssets.browser_download_url}");
                 cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}");
                 cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}");
 
