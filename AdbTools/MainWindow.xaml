@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AdbTools" xmlns:customcontrol="clr-namespace:AdbTools.CustomControl"
         mc:Ignorable="d"
-        Title="Adb连接工具" Height="480" Width="350" FontSize="16" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded" >
+        Title="Adb连接工具" Height="460" Width="350" FontSize="16" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded" >
     <Window.Resources>
         <ContextMenu x:Key="ListBoxItemContextMenu"  FontSize="13">
             <MenuItem x:Name="installApkItem" Header="安装应用" Click="installApkItem_Click" Cursor="Hand"   Margin="0,2" />
@@ -42,26 +42,34 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel x:Name="menuHeader" Grid.Row="0" Orientation="Horizontal" Cursor="" Background="#FFEEEEEE">
-            <Button x:Name="setup" Content="设置" Cursor="Hand" Background="{x:Null}" Margin="10,0,0,0" Click="setup_Click"/>
-            <Popup x:Name="setup_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=setup}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
-                <Border Background="{Binding ElementName=menuHeader,Path=Background}"  CornerRadius="0,0,5,5" Padding="10" BorderBrush="#FFC7FFA6" BorderThickness="1,0,1,1">
-                    <StackPanel>
-                        <CheckBox IsChecked="False" x:Name="topmastCB" Content="置顶显示" Cursor="Hand" Click="topmastCB_Click" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-                    </StackPanel>
-                </Border>
-            </Popup>
-            
-            <Button x:Name="about" Content="关于" Cursor="Hand" Background="{x:Null}" Margin="10,0,0,0" Click="about_Click"/>
-            <Popup x:Name="about_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=about}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
-                <Border Background="{Binding ElementName=menuHeader,Path=Background}"  CornerRadius="0,0,5,5" Padding="10" BorderBrush="#FFC7FFA6" BorderThickness="1,0,1,1">
-                    <StackPanel Cursor="">
-                        <Button x:Name="projectAddress" Content="项目地址" Padding="5" Background="{x:Null}" Click="projectAddress_Click"/>
-                        <Button x:Name="cheackUpdate" Content="检查更新" Padding="5" Background="{x:Null}" Click="cheackUpdate_Click"/>
-                    </StackPanel>
-                </Border>
-            </Popup>
-        </StackPanel>
+        <Grid  Grid.Row="0"  x:Name="menuHeader" Background="#FFF6F6F6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button x:Name="setup" Content="设置" Cursor="Hand" Background="{x:Null}" Margin="10,0,0,0" Click="setup_Click"/>
+                <Popup x:Name="setup_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=setup}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
+                    <Border Background="{Binding ElementName=menuHeader,Path=Background}" Padding="10" CornerRadius="0,0,5,5" BorderBrush="#FF06AB26" BorderThickness="1,0,1,1">
+                        <StackPanel>
+                            <CheckBox IsChecked="False" x:Name="topmastCB" Content="置顶显示" Cursor="Hand" Click="topmastCB_Click" VerticalContentAlignment="Center" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+                <Button x:Name="about" Content="关于" Cursor="Hand" Background="{x:Null}" Margin="10,0,0,0" Click="about_Click"/>
+                <Popup x:Name="about_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=about}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
+                    <Border Background="{Binding ElementName=menuHeader,Path=Background}" Padding="10" CornerRadius="0,0,5,5" BorderBrush="#FF06AB26" BorderThickness="1,0,1,1">
+                        <StackPanel Cursor="">
+                            <Button x:Name="projectAddress" Content="项目地址" Background="{x:Null}" Click="projectAddress_Click" HorizontalAlignment="Left" Cursor="Hand"/>
+                            <Button x:Name="cheackUpdate" Content="检查更新" Margin="0,10,0,0" Background="{x:Null}" Click="cheackUpdate_Click" HorizontalAlignment="Left" Cursor="Hand"/>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+               </StackPanel>
+
+            <Image x:Name="updateVersion" Grid.Column="1" Visibility="Collapsed" Source="/resource/imgs/new_version.png" VerticalAlignment="Center" HorizontalAlignment="Center" Width="25" Height="25"  MouseDown="updateVersion_MouseDown" />
+        </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,10">
             <Label Content="IP和端口" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="85"/>
             <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文【:】连接IP和端口" Margin="100,10,10,0" IsSynchronizedWithCurrentItem="False" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" TabIndex="0" >
@@ -73,14 +81,15 @@
             </ComboBox>
             <Label Content="配对码" Margin="10,50,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="85"/>
             <TextBox x:Name="pairCode" Margin="100,50,10,0" Height="30" ToolTip="配对设备时输入配对码"  VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MaxLength="10" TabIndex="1"/>
-            <Button x:Name="connectDevice" IsDefault="True" Content="连接(Enter)" ToolTip="输入连接的IP和端口进行连接"  Foreground="White" Background="#FF2A9FFF"  Margin="10,90,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" Width="110" Click="connectDevice_Click" Cursor="Hand" TabIndex="2"/>
-            <Button x:Name="pairDevice" Content="配对(F8)" ToolTip="输入配对的IP和端口进行配对" Margin="0,90,10,0"  Foreground="White" Background="#FFE87D00"  VerticalAlignment="Top" Height="30" HorizontalAlignment="Right" Width="110" Click="pairDevice_Click" Cursor="Hand" TabIndex="3"/>
+            <Button x:Name="connectDevice" IsDefault="True" Content="连接(Enter)" ToolTip="输入连接的IP和端口进行连接"  Foreground="White" Background="#FF2A9FFF"  Margin="10,90,0,0" VerticalAlignment="Top" Height="30" HorizontalAlignment="Left" Width="100" Click="connectDevice_Click" Cursor="Hand" TabIndex="2"/>
+            <Button x:Name="refreshList" Content="刷新(F5)" ToolTip="刷新已连接列表" Margin="0,90,0,10" Width="100" Cursor="Hand" Height="30" VerticalAlignment="Bottom" Click="refreshList_Click" Foreground="White" BorderBrush="{x:Null}" Background="#FF06AB26" TabIndex="5"/>
+            <Button x:Name="pairDevice" Content="配对(F8)" ToolTip="输入配对的IP和端口进行配对" Margin="0,90,10,0"  Foreground="White" Background="#FFE87D00"  VerticalAlignment="Top" Height="30" HorizontalAlignment="Right" Width="100" Click="pairDevice_Click" Cursor="Hand" TabIndex="3"/>
 
         </Grid>
 
         <Grid Grid.Row="2" Grid.ColumnSpan="3">
-            <Label Content="连接列表" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
-            <ListBox x:Name="deviceList" Margin="10,40,10,50" ToolTip="右键连接的设备进行操作" ItemsSource="{Binding}" HorizontalContentAlignment="Center" TabIndex="4" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+            <Label Content="连接列表" Margin="10,0,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
+            <ListBox x:Name="deviceList" Margin="10,35,10,10" ToolTip="右键连接的设备进行操作" ItemsSource="{Binding}" HorizontalContentAlignment="Center" TabIndex="4" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel Orientation="Vertical" />
@@ -106,9 +115,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button x:Name="refreshList" Content="刷新(F5)" ToolTip="刷新已连接列表" Margin="0,0,0,10" Width="110" Cursor="Hand" Height="30" VerticalAlignment="Bottom" Click="refreshList_Click" Foreground="White" BorderBrush="{x:Null}" Background="#FF06AB26" TabIndex="5"/>
-            <Image x:Name="updateVersion" Visibility="Collapsed" Source="/resource/imgs/new_version.png" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="30" Height="30" Margin="0,0,10,10" MouseDown="updateVersion_MouseDown" />
-        </Grid>
+          </Grid>
 
         <Grid Grid.RowSpan="2" Visibility="Collapsed" x:Name="processBarGrid" Background="#7F000000" >
             <customcontrol:RoundProcessBarLoading x:Name="waitProcessBar" Height="130" Width="130"/>
