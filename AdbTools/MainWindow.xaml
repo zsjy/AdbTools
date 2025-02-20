@@ -117,7 +117,7 @@
             </ListBox>
           </Grid>
 
-        <Grid Grid.RowSpan="2" Visibility="Collapsed" x:Name="processBarGrid" Background="#7F000000" >
+        <Grid Grid.RowSpan="3" Visibility="Collapsed" x:Name="processBarGrid" Background="#7F000000" >
             <customcontrol:RoundProcessBarLoading x:Name="waitProcessBar" Height="130" Width="130"/>
             <Label Content="处理中"  Height="120" Width="120" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="White"/>
         </Grid>
