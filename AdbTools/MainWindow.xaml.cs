@@ -480,6 +480,10 @@ namespace AdbTools
             CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {device.DeviceMark} logcat -s DEBUG");
         }
 
+
+
+        #region 《版本更新》
+
         private void updateVersion_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -529,6 +533,8 @@ namespace AdbTools
 
             }
         }
+
+        #endregion
 
         #region 《关于菜单及控制》
 
