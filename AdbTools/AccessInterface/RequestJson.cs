@@ -13,6 +13,9 @@ using System.Windows.Controls;
 
 namespace AdbTools.AccessInterface
 {
+
+    public delegate void UpdateInfo(GithubReleases githubReleases);
+
     /// <summary>
     /// post请求
     /// </summary>
@@ -20,11 +23,20 @@ namespace AdbTools.AccessInterface
     {
         public const string ApiUrl = @"https://api.github.com/repos/zsjy/AdbTools/releases";
         public const string ApiUrlMirror = @"https://code.hcjike.com/api/v1/repos/hcjike/AdbTools/releases";
-        
+
         public const string UpdateFileName = "update.zip";
         private static JavaScriptSerializer jss = new JavaScriptSerializer();
 
         public static void UpdateCheck(MainWindow mainWindow, Image updateVersion)
+        {
+            UpdateCheck(mainWindow, githubReleases =>
+            {
+                updateVersion.Visibility = Visibility.Visible;
+                updateVersion.Tag = githubReleases;
+            });
+        }
+
+        public static void UpdateCheck(MainWindow mainWindow, UpdateInfo action)
         {
             Thread thread = new Thread(new ThreadStart(() =>
             {
@@ -48,8 +60,7 @@ namespace AdbTools.AccessInterface
 
                 mainWindow.Dispatcher.Invoke(new Action(() =>
                 {
-                    updateVersion.Visibility = Visibility.Visible;
-                    updateVersion.Tag = githubReleases;
+                    action.Invoke(githubReleases);
                 }));
             }));
             thread.Start();

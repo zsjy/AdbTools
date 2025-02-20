@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AdbTools" xmlns:customcontrol="clr-namespace:AdbTools.CustomControl"
         mc:Ignorable="d"
-        Title="Adb连接工具" Height="450" Width="350" FontSize="16" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded" >
+        Title="Adb连接工具" Height="480" Width="350" FontSize="16" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Unloaded="Window_Unloaded" >
     <Window.Resources>
         <ContextMenu x:Key="ListBoxItemContextMenu"  FontSize="13">
             <MenuItem x:Name="installApkItem" Header="安装应用" Click="installApkItem_Click" Cursor="Hand"   Margin="0,2" />
@@ -17,7 +17,7 @@
             </MenuItem>
             <Separator  Margin="0,5"/>
             <MenuItem Header="恢复默认" Cursor="Hand" Margin="0,2" >
-                <MenuItem x:Name="resetPXItem" Header="恢复默认分辨率" Cursor="Hand"   Margin="0,2" Click="resetPXItem_Click" />
+                <MenuItem x:Name="resetPXItem" Header="恢复默认分辨率" Cursor="Hand" Margin="0,2" Click="resetPXItem_Click" />
                 <MenuItem x:Name="resetDPIItem" Header="恢复默认DPI" Cursor="Hand" Margin="0,2" Click="resetDPIItem_Click"/>
             </MenuItem>
             <Separator  Margin="0,5"/>
@@ -38,10 +38,31 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" Grid.ColumnSpan="3" Margin="0,0,0,10">
+        <StackPanel x:Name="menuHeader" Grid.Row="0" Orientation="Horizontal" Cursor="" Background="#FFEEEEEE">
+            <Button x:Name="setup" Content="设置" Cursor="Hand" Background="{x:Null}" Margin="10,0,0,0" Click="setup_Click"/>
+            <Popup x:Name="setup_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=setup}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
+                <Border Background="{Binding ElementName=menuHeader,Path=Background}"  CornerRadius="0,0,5,5" Padding="10" BorderBrush="#FFC7FFA6" BorderThickness="1,0,1,1">
+                    <StackPanel>
+                        <CheckBox IsChecked="False" x:Name="topmastCB" Content="置顶显示" Cursor="Hand" Click="topmastCB_Click" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </Popup>
+            
+            <Button x:Name="about" Content="关于" Cursor="Hand" Background="{x:Null}" Margin="10,0,0,0" Click="about_Click"/>
+            <Popup x:Name="about_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=about}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
+                <Border Background="{Binding ElementName=menuHeader,Path=Background}"  CornerRadius="0,0,5,5" Padding="10" BorderBrush="#FFC7FFA6" BorderThickness="1,0,1,1">
+                    <StackPanel Cursor="">
+                        <Button x:Name="projectAddress" Content="项目地址" Padding="5" Background="{x:Null}" Click="projectAddress_Click"/>
+                        <Button x:Name="cheackUpdate" Content="检查更新" Padding="5" Background="{x:Null}" Click="cheackUpdate_Click"/>
+                    </StackPanel>
+                </Border>
+            </Popup>
+        </StackPanel>
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,10">
             <Label Content="IP和端口" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="85"/>
             <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文【:】连接IP和端口" Margin="100,10,10,0" IsSynchronizedWithCurrentItem="False" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" TabIndex="0" >
                 <ComboBox.ItemTemplate>
@@ -57,7 +78,7 @@
 
         </Grid>
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="3">
+        <Grid Grid.Row="2" Grid.ColumnSpan="3">
             <Label Content="连接列表" Margin="10,5,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center"/>
             <ListBox x:Name="deviceList" Margin="10,40,10,50" ToolTip="右键连接的设备进行操作" ItemsSource="{Binding}" HorizontalContentAlignment="Center" TabIndex="4" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                 <ListBox.ItemsPanel>

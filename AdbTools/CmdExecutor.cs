@@ -94,6 +94,11 @@ namespace AdbTools
             }
         }
 
+        public static bool StartExe(string exePath)
+        {
+            return StartExe(exePath, new List<string>());
+        }
+
         public static bool StartExe(string exePath, List<string> cmdArges)
         {
             string args = "";

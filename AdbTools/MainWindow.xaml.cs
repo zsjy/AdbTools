@@ -19,6 +19,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Update;
 
 namespace AdbTools
 {
@@ -484,36 +485,88 @@ namespace AdbTools
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 GithubReleases githubReleases = (GithubReleases)updateVersion.Tag;
-                if (null == githubReleases) return;
-                GithubReleasesAssets githubReleasesAssets = null;
-                foreach (GithubReleasesAssets assets in githubReleases.Assets)
-                {
-                    if (RequestJson.UpdateFileName.Equals(assets.Name, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        githubReleasesAssets = assets;
-                    }
-                }
-                if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.Name}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-                {
-                    return;
-                }
-
-                List<string> cmdArges = new List<string>();
-                //cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
-                cmdArges.Add($"{githubReleasesAssets.browser_download_url}");
-                cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}");
-                cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}");
-
-                if (CmdExecutor.StartExe($"{AppDomain.CurrentDomain.BaseDirectory}Update.exe", cmdArges))
-                {
-                    ///退出当前新开进程，不走OnExit方法
-                    Environment.Exit(0);
-                }
-                else
-                {
-                    
-                }
+                UpdateVersion(githubReleases);
             }
         }
+
+        private void UpdateVersion(GithubReleases githubReleases)
+        {
+            if (null == githubReleases) return;
+            GithubReleasesAssets githubReleasesAssets = null;
+            foreach (GithubReleasesAssets assets in githubReleases.Assets)
+            {
+                if (RequestJson.UpdateFileName.Equals(assets.Name, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    githubReleasesAssets = assets;
+                }
+            }
+            if (null == githubReleasesAssets)
+            {
+                return;
+            }
+
+            updateVersion.Visibility = Visibility.Visible;
+            updateVersion.Tag = githubReleases;
+
+            if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.Name}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            {
+                return;
+            }
+
+            List<string> cmdArges = new List<string>();
+            //cmdArges.Add($"{Globals.AppSettings.GITHUB_PROXY}{githubReleasesAssets.browser_download_url}");
+            cmdArges.Add($"{githubReleasesAssets.browser_download_url}");
+            cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}");
+            cmdArges.Add($"{AppDomain.CurrentDomain.BaseDirectory}{AppDomain.CurrentDomain.FriendlyName}");
+
+            if (CmdExecutor.StartExe($"{AppDomain.CurrentDomain.BaseDirectory}Update.exe", cmdArges))
+            {
+                ///退出当前新开进程，不走OnExit方法
+                Environment.Exit(0);
+            }
+            else
+            {
+
+            }
+        }
+
+        #region 《关于菜单及控制》
+
+        private void about_Click(object sender, RoutedEventArgs e)
+        {
+            about_popup.IsOpen = true;
+        }
+
+        private void projectAddress_Click(object sender, RoutedEventArgs e)
+        {
+            about_popup.IsOpen = false;
+            CmdExecutor.StartExe("https://github.com/zsjy/AdbTools");
+        }
+
+        private void cheackUpdate_Click(object sender, RoutedEventArgs e)
+        {
+            about_popup.IsOpen = false;
+            RequestJson.UpdateCheck(this, githubReleases =>
+            {
+                UpdateVersion(githubReleases);
+            });
+        }
+
+        #endregion
+
+        #region 《设置菜单及控制》
+
+        private void setup_Click(object sender, RoutedEventArgs e)
+        {
+            setup_popup.IsOpen = true;
+        }
+
+        private void topmastCB_Click(object sender, RoutedEventArgs e)
+        {
+            this.Topmost = (bool)topmastCB.IsChecked;
+            setup_popup.IsOpen = false;
+        }
+        #endregion
+
     }
 }
