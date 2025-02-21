@@ -33,9 +33,7 @@ namespace AdbTools
                 if (createMeetingProcess.Count() > 1)
                 {
                     HandleRunningInstance(createMeetingProcess[0]);
-                    ///退出当前新开进程，不走OnExit方法
-                    Environment.Exit(0);
-                    //Application.Current.Shutdown();
+                    Application.Current.Shutdown();
                     return;
                 }
             }

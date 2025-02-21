@@ -115,8 +115,7 @@ namespace Update
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                ///退出当前新开进程，不走OnExit方法
-                Environment.Exit(0);
+                Application.Current.Shutdown();
             }));
         }
 

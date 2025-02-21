@@ -52,7 +52,7 @@
                 <Popup x:Name="setup_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=setup}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
                     <Border Background="{Binding ElementName=menuHeader,Path=Background}" Padding="10" CornerRadius="0,0,5,5" BorderBrush="#FF06AB26" BorderThickness="1,0,1,1">
                         <StackPanel>
-                            <CheckBox IsChecked="False" x:Name="topmastCB" Content="置顶显示" Cursor="Hand" Click="topmastCB_Click" VerticalContentAlignment="Center" HorizontalAlignment="Left" />
+                            <CheckBox IsChecked="False" x:Name="topmastCB" Content="置顶显示" Cursor="Hand" Click="topmastCB_Click" VerticalContentAlignment="Center" HorizontalAlignment="Left"  FontSize="14"/>
                         </StackPanel>
                     </Border>
                 </Popup>
@@ -61,8 +61,8 @@
                 <Popup x:Name="about_popup" Placement="Bottom" PlacementTarget="{Binding ElementName=about}" StaysOpen="False" HorizontalOffset="0" VerticalOffset="0" AllowsTransparency="True">
                     <Border Background="{Binding ElementName=menuHeader,Path=Background}" Padding="10" CornerRadius="0,0,5,5" BorderBrush="#FF06AB26" BorderThickness="1,0,1,1">
                         <StackPanel Cursor="">
-                            <Button x:Name="projectAddress" Content="项目地址" Background="{x:Null}" Click="projectAddress_Click" HorizontalAlignment="Left" Cursor="Hand"/>
-                            <Button x:Name="cheackUpdate" Content="检查更新" Margin="0,10,0,0" Background="{x:Null}" Click="cheackUpdate_Click" HorizontalAlignment="Left" Cursor="Hand"/>
+                            <Button x:Name="projectAddress" Content="项目地址" Background="{x:Null}" Click="projectAddress_Click" HorizontalAlignment="Left" Cursor="Hand" FontSize="14"/>
+                            <Button x:Name="cheackUpdate" Content="检查更新" Margin="0,10,0,0" Background="{x:Null}" Click="cheackUpdate_Click" HorizontalAlignment="Left" Cursor="Hand" FontSize="14"/>
                         </StackPanel>
                     </Border>
                 </Popup>
