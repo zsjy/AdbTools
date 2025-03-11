@@ -424,6 +424,27 @@ namespace AdbTools
             Timer_Tick(null, null);
         }
 
+        private void resetPortItem_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【恢复默认TCP端口(5555)】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            {
+                waitAnimation(true);
+                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} tcpip 5555 " }, result =>
+                {
+                    waitAnimation(false);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】恢复默认TCP端口(5555)成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                },
+                err =>
+                {
+                    waitAnimation(false);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】恢复默认TCP端口(5555)失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return true;
+                });
+            }
+        }
+
         private void resetPXItem_Click(object sender, RoutedEventArgs e)
         {
             int index = deviceList.SelectedIndex;
