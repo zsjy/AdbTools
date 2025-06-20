@@ -22,6 +22,26 @@
                 <MenuItem x:Name="resetDPIItem" Header="恢复默认DPI" Cursor="Hand" Margin="0,2" Click="resetDPIItem_Click"/>
             </MenuItem>
             <Separator  Margin="0,5"/>
+            <MenuItem Header="应用禁用与启用" Cursor="Hand" Margin="0,2">
+                <MenuItem x:Name="showAllPackage" Header="显示所有安装应用包名" Cursor="Hand" Margin="0,2" Click="showAllPackage_Click"/>
+                <MenuItem Header="电话(原生系统)" Cursor="Hand" Margin="0,2">
+                    <MenuItem x:Name="phoneEnable" Header="启用" Cursor="Hand" Margin="0,2" Click="phoneEnable_Click"/>
+                    <MenuItem x:Name="phoneDisable" Header="禁用" Cursor="Hand" Margin="0,2" Click="phoneDisable_Click"/>
+                </MenuItem>
+                <MenuItem Header="通讯录(原生系统)" Cursor="Hand" Margin="0,2">
+                    <MenuItem x:Name="bookEnable" Header="启用" Cursor="Hand" Margin="0,2" Click="bookEnable_Click"/>
+                    <MenuItem x:Name="bookDisable" Header="禁用" Cursor="Hand" Margin="0,2" Click="bookDisable_Click"/>
+                </MenuItem>
+                <MenuItem Header="短信(原生系统)" Cursor="Hand" Margin="0,2">
+                    <MenuItem x:Name="smskEnable" Header="启用" Cursor="Hand" Margin="0,2" Click="smskEnable_Click"/>
+                    <MenuItem x:Name="smsDisable" Header="禁用" Cursor="Hand" Margin="0,2" Click="smsDisable_Click"/>
+                </MenuItem>
+                <MenuItem Header="指定包名应用" Cursor="Hand" Margin="0,2">
+                    <MenuItem x:Name="customkEnable" Header="启用" Cursor="Hand" Margin="0,2" Click="customkEnable_Click"/>
+                    <MenuItem x:Name="customDisable" Header="禁用" Cursor="Hand" Margin="0,2" Click="customDisable_Click"/>
+                </MenuItem>
+            </MenuItem>
+            <Separator  Margin="0,5"/>
             <MenuItem x:Name="disconnectAllDeviceItem" Header="断开所有设备" Click="disconnectAllDeviceItem_Click" Cursor="Hand" Margin="0,2" />
         </ContextMenu>
         <ContextMenu x:Key="ComboBoxItemContextMenu" FontSize="13">
