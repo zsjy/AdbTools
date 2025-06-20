@@ -766,24 +766,29 @@ namespace AdbTools
         {
             int index = deviceList.SelectedIndex;
             Device device = deviceAddressList[index];
-
-
-
-
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【启用包名】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            InputWindow inputWindow = new InputWindow()
             {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm disable-user com.android.mms " }, result =>
+                Title = "请输入包名"
+            };
+            inputWindow.Owner = this;
+            if (inputWindow.ShowDialog() == true)
+            {
+                string package = inputWindow.Result;
+                if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【启用包名{package}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
                 {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用包名成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用包名失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
+                    waitAnimation(true);
+                    CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm enable {package} " }, result =>
+                    {
+                        waitAnimation(false);
+                        MessageBox.Show($"设备【{device.ShowDeviceName}】启用包名{package}成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    },
+                    err =>
+                    {
+                        waitAnimation(false);
+                        MessageBox.Show($"设备【{device.ShowDeviceName}】启用包名{package}失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return true;
+                    });
+                }
             }
         }
 
@@ -791,20 +796,29 @@ namespace AdbTools
         {
             int index = deviceList.SelectedIndex;
             Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【禁用包名】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            InputWindow inputWindow = new InputWindow()
             {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm disable-user com.android.mms " }, result =>
+                Title = "请输入包名"
+            };
+            inputWindow.Owner = this;
+            if (inputWindow.ShowDialog() == true)
+            {
+                string package = inputWindow.Result;
+                if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【禁用包名{package}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
                 {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用包名成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用包名失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
+                    waitAnimation(true);
+                    CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm disable-user {package} " }, result =>
+                    {
+                        waitAnimation(false);
+                        MessageBox.Show($"设备【{device.ShowDeviceName}】禁用包名{package}成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    },
+                    err =>
+                    {
+                        waitAnimation(false);
+                        MessageBox.Show($"设备【{device.ShowDeviceName}】禁用包名{package}失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return true;
+                    });
+                }
             }
         }
 
