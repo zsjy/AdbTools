@@ -24,12 +24,10 @@ namespace AdbTools
             InitializeComponent();
         }
 
-        public string TitleContent { get; set; }
         public string DescriptionContent { get; set; }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.Title = TitleContent;
             this.message.Text = DescriptionContent;
         }
     }

@@ -595,172 +595,6 @@ namespace AdbTools
         #endregion
 
 
-        private void showAllPackage_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark}  shell pm list packages " }, result =>
-            {
-                // 1. 按行分割
-                string[] lines = result.Replace("package:", "").Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-                // 2. 找到 "shell pm list packages" 所在行
-                int startIndex = -1;
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    if (lines[i].Contains("shell pm list packages"))
-                    {
-                        startIndex = i + 1; // 下一行开始就是包名
-                        break;
-                    }
-                }
-                // 3. 提取包名（遇到空行就结束）
-                List<string> packages = new List<string>();
-                for (int i = startIndex; i < lines.Length; i++)
-                {
-                    string line = lines[i].Trim();
-                    if (string.IsNullOrEmpty(line))
-                    {
-                        break;
-                    }
-                    packages.Add(line);
-                }
-                waitAnimation(false);
-                InfoShowWindow infoShowWindow = new InfoShowWindow() { TitleContent = "安装应用包名", DescriptionContent = string.Join("\r\n", packages) };
-                infoShowWindow.Show();
-            },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】获取所有安装应用包名失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-        }
-
-        private void phoneEnable_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【启用电话应用】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-            {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm enable com.android.dialer " }, result =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用电话应用成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用电话应用失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-            }
-        }
-
-        private void phoneDisable_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【禁用电话应用】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-            {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm disable-user com.android.dialer " }, result =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用电话应用成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用电话应用失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-            }
-        }
-
-        private void bookEnable_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【启用通讯录应用】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-            {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm enable com.android.contacts " }, result =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用通讯录应用成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用通讯录应用失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-            }
-        }
-
-        private void bookDisable_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【禁用通讯录应用】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-            {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm disable-user com.android.contacts " }, result =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用通讯录应用成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用通讯录应用失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-            }
-        }
-
-        private void smskEnable_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【启用短信应用】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-            {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm enable com.android.mms " }, result =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用短信应用成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】启用短信应用失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-            }
-        }
-
-        private void smsDisable_Click(object sender, RoutedEventArgs e)
-        {
-            int index = deviceList.SelectedIndex;
-            Device device = deviceAddressList[index];
-            if (MessageBoxResult.OK == MessageBox.Show($"确定要对设备【{device.ShowDeviceName}】执行【禁用短信应用】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
-            {
-                waitAnimation(true);
-                CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark} shell pm disable-user com.android.mms " }, result =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用短信应用成功", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                },
-                err =>
-                {
-                    waitAnimation(false);
-                    MessageBox.Show($"设备【{device.ShowDeviceName}】禁用短信应用失败！\r\n1.检查设备是否已离线；\r\n2.应用包名未找到！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return true;
-                });
-            }
-        }
 
         private void customkEnable_Click(object sender, RoutedEventArgs e)
         {
@@ -822,5 +656,148 @@ namespace AdbTools
             }
         }
 
+        private void systemAppPackagep_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark}  shell pm list packages  -s " }, result =>
+            {
+                // 1. 按行分割
+                string[] lines = result.Replace("package:", "").Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                // 2. 找到 "shell pm list packages" 所在行
+                int startIndex = -1;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i].Contains("shell pm list packages"))
+                    {
+                        startIndex = i + 1; // 下一行开始就是包名
+                        break;
+                    }
+                }
+                // 3. 提取包名（遇到空行就结束）
+                List<string> packages = new List<string>();
+                for (int i = startIndex; i < lines.Length; i++)
+                {
+                    string line = lines[i].Trim();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        break;
+                    }
+                    packages.Add(line);
+                }
+                waitAnimation(false);
+                InfoShowWindow infoShowWindow = new InfoShowWindow() { Title = "系统安装应用包名", DescriptionContent = string.Join("\r\n", packages) };
+                infoShowWindow.Show();
+            },
+                err =>
+                {
+                    waitAnimation(false);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】获取系统安装应用包名失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return true;
+                });
+        }
+
+        private void thirdPartyAppPackage_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark}  shell pm list packages  -3 " }, result =>
+            {
+                // 1. 按行分割
+                string[] lines = result.Replace("package:", "").Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                // 2. 找到 "shell pm list packages" 所在行
+                int startIndex = -1;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i].Contains("shell pm list packages"))
+                    {
+                        startIndex = i + 1; // 下一行开始就是包名
+                        break;
+                    }
+                }
+                // 3. 提取包名（遇到空行就结束）
+                List<string> packages = new List<string>();
+                for (int i = startIndex; i < lines.Length; i++)
+                {
+                    string line = lines[i].Trim();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        break;
+                    }
+                    packages.Add(line);
+                }
+                waitAnimation(false);
+                InfoShowWindow infoShowWindow = new InfoShowWindow() { Title = "第三方安装应用包名", DescriptionContent = string.Join("\r\n", packages) };
+                infoShowWindow.Show();
+            },
+                err =>
+                {
+                    waitAnimation(false);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】获取第三方安装应用包名失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return true;
+                });
+        }
+
+        private void allAppPackage_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} -s {device.DeviceMark}  shell pm list packages" }, result =>
+            {
+                // 1. 按行分割
+                string[] lines = result.Replace("package:", "").Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+                // 2. 找到 "shell pm list packages" 所在行
+                int startIndex = -1;
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i].Contains("shell pm list packages"))
+                    {
+                        startIndex = i + 1; // 下一行开始就是包名
+                        break;
+                    }
+                }
+                // 3. 提取包名（遇到空行就结束）
+                List<string> packages = new List<string>();
+                for (int i = startIndex; i < lines.Length; i++)
+                {
+                    string line = lines[i].Trim();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        break;
+                    }
+                    packages.Add(line);
+                }
+                waitAnimation(false);
+                InfoShowWindow infoShowWindow = new InfoShowWindow() { Title = "所有安装应用包名", DescriptionContent = string.Join("\r\n", packages) };
+                infoShowWindow.Show();
+            },
+                err =>
+                {
+                    waitAnimation(false);
+                    MessageBox.Show($"设备【{device.ShowDeviceName}】获取所有安装应用包名失败！\r\n检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return true;
+                });
+        }
+
+        private void disableAllAppPackage_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            if (!"alps k71v1_64_bsp".Equals(device.DeviceInfo, StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show($"仅支持操作设备【alps k71v1_64_bsp】", "提示", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            AlpsK71v1Window alpsK71V1Window = new AlpsK71v1Window()
+            {
+                Title = $"一键处理【{device.ShowDeviceName}】多余应用",
+                AdbPath = adbPath,
+                DeviceInfo = device,
+            };
+            alpsK71V1Window.Owner = this;
+            alpsK71V1Window.ShowDialog();
+
+        }
     }
 }
