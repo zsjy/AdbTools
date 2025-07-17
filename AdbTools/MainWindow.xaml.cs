@@ -224,34 +224,13 @@ namespace AdbTools
 
         private void pairDevice_Click(object sender, RoutedEventArgs e)
         {
-            string address = deviceAddress.Text;
-            address = address.Replace("：", ":");
-            deviceAddress.Text = address;
-            string code = pairCode.Text;
-            if (!IsValidIPEndPoint(address))
+            PairWindow pairWindow = new PairWindow()
             {
-                MessageBox.Show("设备配对地址输入错误！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(code))
-            {
-                MessageBox.Show("请输入配对码！", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            waitAnimation(true);
-            CmdExecutor.ExecuteCommandAndReturnAsync(new string[] { $"{adbPath} pair {address}", code }, result =>
-            {
-                waitAnimation(false);
-                if (string.IsNullOrWhiteSpace(result) || !ContainsAny(result, new string[] { "Successfully" }))
-                {
-                    MessageBox.Show("设备配对失败！\r\n1.确认IP地址和端口是否处于配对状态；\r\n2.配对码输入是否正确。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-                if (ContainsAny(result, new string[] { "Successfully" }))
-                {
-                    MessageBox.Show("设备配对成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                }
-            }, null);
+                AdbPath = adbPath,
+                Address = deviceAddress.Text,
+            };
+            pairWindow.Owner = this;
+            pairWindow.ShowDialog();
         }
 
         private string SelectApkFile()
