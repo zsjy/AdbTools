@@ -25,7 +25,7 @@ jobs:
       run: |
         Write-Output "Building solution..."
         
-        # 构建解决方案
+        # 构建解决方案（修正了/flp参数语法）
         msbuild $env:SOLUTION_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
@@ -33,7 +33,7 @@ jobs:
           /p:OutputPath=$env:OUTPUT_DIR `
           /t:Clean,Build `
           /v:diag `
-          /flp:LogFile=msbuild.log;Verbosity=diagnostic
+          /flp:"LogFile=msbuild.log;Verbosity=diagnostic"
         
         # 显示构建日志
         Get-Content msbuild.log
