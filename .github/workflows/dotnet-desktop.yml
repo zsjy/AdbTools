@@ -10,7 +10,9 @@ jobs:
     env:
       BUILD_PLATFORM: x64
       BUILD_CONFIG: Release
-      OUTPUT_DIR: bin\x64\Release
+      SOLUTION_PATH: AdbTools.sln
+      PROJECT_PATH: AdbTools/AdbTools.csproj
+      OUTPUT_DIR: bin/x64/Release
 
     steps:
     - name: Checkout code
@@ -19,14 +21,15 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    - name: Build solution with detailed logging
+    - name: Build solution
       run: |
-        # 启用详细日志记录
-        msbuild AdbTools.sln `
+        # 清理并构建解决方案
+        msbuild $env:SOLUTION_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
           /p:PlatformTarget=x64 `
           /p:OutputPath=$env:OUTPUT_DIR `
+          /t:Clean,Build `
           /v:diag `
           /flp:LogFile=msbuild.log;Verbosity=diagnostic
         
@@ -45,13 +48,14 @@ jobs:
 
     - name: Prepare artifacts
       run: |
-        # 创建artifacts目录
-        if not exist "artifacts" mkdir artifacts
+        # 确保artifacts目录存在且为空
+        if exist "artifacts" (rmdir /s /q artifacts)
+        mkdir artifacts
         
         # 复制构建输出
         robocopy "$env:OUTPUT_DIR" "artifacts" /E /NFL /NDL /NJH /NJS /nc /ns /np
         
-        # 清理不需要的文件
+        # 删除不需要的文件
         powershell -command "
           Remove-Item -Path 'artifacts\*.pdb' -ErrorAction SilentlyContinue
           Remove-Item -Path 'artifacts\*.xml' -ErrorAction SilentlyContinue
@@ -61,21 +65,28 @@ jobs:
 
     - name: Create update package
       run: |
+        # 检查主程序是否存在
+        if not exist "artifacts\AdbTools.exe" (
+          echo "##[error]AdbTools.exe not found in artifacts directory"
+          dir /s artifacts
+          exit 1
+        )
+        
+        # 创建update.zip
         powershell -command "
-          if (-not (Test-Path 'artifacts\AdbTools.exe')) {
-            Write-Error 'AdbTools.exe not found in artifacts directory'
-            Get-ChildItem -Path 'artifacts'
-            exit 1
-          }
-          Compress-Archive -Path 'artifacts\AdbTools.exe' -DestinationPath 'artifacts\update.zip' -CompressionLevel Optimal
+          Compress-Archive -Path 'artifacts\AdbTools.exe' `
+                          -DestinationPath 'artifacts\update.zip' `
+                          -CompressionLevel Optimal
         "
       shell: cmd
 
     - name: Create full release package
       run: |
+        # 创建完整发布包
         powershell -command "
           Get-ChildItem -Path 'artifacts\' -Exclude '*.zip' | 
-          Compress-Archive -DestinationPath 'artifacts\AdbTools.zip' -CompressionLevel Optimal -Force
+          Compress-Archive -DestinationPath 'artifacts\AdbTools.zip' `
+                          -CompressionLevel Optimal -Force
         "
       shell: cmd
 
