@@ -1,0 +1,87 @@
+name: Build and Release x64
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest # .NET 4.6 需要 Windows 环境
+    env:
+      BUILD_PLATFORM: x64
+      BUILD_CONFIG: Release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: nuget/setup-nuget@v1
+      with:
+        nuget-version: '5.x' # 使用 NuGet 5.x 版本
+
+    - name: Restore NuGet packages
+      run: nuget restore AdbTools.sln
+
+    - name: Build x64 Release configuration
+      run: |
+        msbuild AdbTools.sln `
+          /p:Configuration=$env:BUILD_CONFIG `
+          /p:Platform="$env:BUILD_PLATFORM" `
+          /p:DeployOnBuild=true `
+          /p:PublishProfile=FolderProfile-x64.pubxml `
+          /p:PlatformTarget=x64
+
+    - name: Create artifacts directory
+      run: mkdir artifacts
+
+    - name: Copy x64 build outputs to artifacts
+      run: |
+        # 复制x64 Release构建输出
+        xcopy /E /I /Y "bin\x64\Release" "artifacts"
+        
+        # 删除不需要的文件（根据你的项目调整）
+        del /F /Q "artifacts\*.pdb"
+        del /F /Q "artifacts\*.xml"
+        del /F /Q "artifacts\*.vshost.*"
+        del /F /Q "artifacts\*.config"
+        
+        # # 保留必要的配置文件
+        # if exist "bin\x64\Release\YourApp.exe.config" (
+        #   copy "bin\x64\Release\YourApp.exe.config" "artifacts"
+        # )
+
+    - name: Create update.zip (x64)
+      run: |
+        # 创建update.zip
+        cd artifacts
+        7z a update-x64.zip AdbTools.exe
+
+    - name: Create full release package (x64)
+      run: |
+        # 创建完整发布包
+        cd artifacts
+        7z a full-release-x64.zip *
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./artifacts/update-x64.zip
+        asset_name: update.zip
+        asset_content_type: application/zip
+
+    - name: Upload Full Release (x64)
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./artifacts/full-release-x64.zip
+        asset_name: AdbTools.zip
+        asset_content_type: application/zip
