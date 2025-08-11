@@ -11,9 +11,8 @@ jobs:
       BUILD_PLATFORM: x64
       BUILD_CONFIG: Release
       SOLUTION_PATH: AdbTools.sln
-      PROJECT_PATH: AdbTools\AdbTools.csproj
-      OUTPUT_DIR: bin\x64\Release
-      OBJ_DIR: obj\x64\Release
+      MAIN_PROJECT_PATH: AdbTools\AdbTools.csproj
+      UPDATE_PROJECT_PATH: Update\Update.csproj
 
     steps:
     - name: Checkout code
@@ -24,62 +23,60 @@ jobs:
 
     - name: Build solution
       run: |
-        Write-Output "🚀 Building solution (x64 Release)..."
+        Write-Output "🚀 Building solution..."
         
-        # 静默构建（移除详细日志）
-        msbuild $env:SOLUTION_PATH `
+        # 静默构建主项目
+        msbuild $env:MAIN_PROJECT_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
           /p:PlatformTarget=x64 `
-          /p:OutputPath=$env:OUTPUT_DIR `
-          /t:Clean,Build `
           /v:minimal `
           /nologo
         
-        # 检查输出目录
-        $outputPath = if (Test-Path $env:OUTPUT_DIR) { 
-            $env:OUTPUT_DIR 
-        } elseif (Test-Path $env:OBJ_DIR) {
-            Write-Output "ℹ️ Using output from $env:OBJ_DIR"
-            $env:OBJ_DIR
-        } else {
-            Write-Error "❌ Build output not found in either $env:OUTPUT_DIR or $env:OBJ_DIR"
+        # 静默构建Update项目
+        msbuild $env:UPDATE_PROJECT_PATH `
+          /p:Configuration=$env:BUILD_CONFIG `
+          /p:Platform=$env:BUILD_PLATFORM `
+          /p:PlatformTarget=x64 `
+          /v:minimal `
+          /nologo
+        
+        # 检查主程序输出
+        $mainExePath = "AdbTools\bin\x64\Release\AdbTools.exe"
+        if (-not (Test-Path $mainExePath)) {
+            Write-Error "❌ AdbTools.exe not found at $mainExePath"
             exit 1
         }
         
-        Write-Output "✅ Build successful! Output path: $outputPath"
+        Write-Output "✅ Build successful! Main output: $mainExePath"
       shell: pwsh
 
     - name: Prepare artifacts
       run: |
-        # 确定实际的输出路径
-        $outputPath = if (Test-Path $env:OUTPUT_DIR) { $env:OUTPUT_DIR } else { $env:OBJ_DIR }
-        
         Write-Output "📦 Preparing artifacts..."
         
-        # 清理并创建artifacts目录
+        # 创建干净的artifacts目录
         if (Test-Path "artifacts") { Remove-Item -Path "artifacts" -Recurse -Force }
         New-Item -ItemType Directory -Path "artifacts" | Out-Null
         
-        # 复制构建输出（静默模式）
-        Copy-Item -Path "$outputPath\*" -Destination "artifacts" -Recurse -Force
+        # 复制主程序文件
+        Copy-Item -Path "AdbTools\bin\x64\Release\*" -Destination "artifacts" -Recurse -Force
+        
+        # 复制Update程序（如果需要）
+        if (Test-Path "Update\bin\x64\Release\Update.exe") {
+            Copy-Item -Path "Update\bin\x64\Release\Update.exe" -Destination "artifacts"
+        }
         
         # 清理不需要的文件
         Remove-Item -Path "artifacts\*.pdb", "artifacts\*.xml", "artifacts\*.vshost.*" -ErrorAction SilentlyContinue
         
-        # 验证主程序
-        if (-not (Test-Path "artifacts\AdbTools.exe")) {
-            Write-Error "❌ AdbTools.exe not found in artifacts"
-            exit 1
-        }
-        
-        Write-Output "✔️ Artifacts prepared successfully"
+        Write-Output "✔️ Artifacts prepared"
       shell: pwsh
 
     - name: Create update package
       run: |
         Write-Output "🗜 Creating update.zip..."
-        Compress-Archive -Path "artifacts\AdbTools.exe" -DestinationPath "artifacts\update.zip" -CompressionLevel Optimal
+        Compress-Archive -Path "artifacts\AdbTools.exe" -DestinationPath "artifacts\update.zip"
         Write-Output "✔️ Update package created"
       shell: pwsh
 
@@ -87,7 +84,7 @@ jobs:
       run: |
         Write-Output "🗜 Creating full release package..."
         Get-ChildItem -Path "artifacts\" -Exclude "*.zip" | 
-          Compress-Archive -DestinationPath "artifacts\AdbTools.zip" -CompressionLevel Optimal -Force
+          Compress-Archive -DestinationPath "artifacts\AdbTools.zip" -Force
         Write-Output "✔️ Full release package created"
       shell: pwsh
 
