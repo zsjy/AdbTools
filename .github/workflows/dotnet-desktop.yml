@@ -25,19 +25,21 @@ jobs:
       run: |
         Write-Output "🚀 Building solution..."
         
-        # 静默构建主项目
+        # 构建主项目（明确指定输出路径）
         msbuild $env:MAIN_PROJECT_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
           /p:PlatformTarget=x64 `
+          /p:OutputPath=bin\x64\Release\ `
           /v:minimal `
           /nologo
         
-        # 静默构建Update项目
+        # 构建Update项目（明确指定输出路径）
         msbuild $env:UPDATE_PROJECT_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
           /p:PlatformTarget=x64 `
+          /p:OutputPath=bin\x64\Release\ `
           /v:minimal `
           /nologo
         
@@ -45,10 +47,13 @@ jobs:
         $mainExePath = "AdbTools\bin\x64\Release\AdbTools.exe"
         if (-not (Test-Path $mainExePath)) {
             Write-Error "❌ AdbTools.exe not found at $mainExePath"
+            Write-Output "##[group]Directory structure"
+            Get-ChildItem -Recurse
+            Write-Output "##[endgroup]"
             exit 1
         }
         
-        Write-Output "✅ Build successful! Main output: $mainExePath"
+        Write-Output "✅ Build successful!"
       shell: pwsh
 
     - name: Prepare artifacts
@@ -60,15 +65,23 @@ jobs:
         New-Item -ItemType Directory -Path "artifacts" | Out-Null
         
         # 复制主程序文件
-        Copy-Item -Path "AdbTools\bin\x64\Release\*" -Destination "artifacts" -Recurse -Force
-        
-        # 复制Update程序（如果需要）
-        if (Test-Path "Update\bin\x64\Release\Update.exe") {
-            Copy-Item -Path "Update\bin\x64\Release\Update.exe" -Destination "artifacts"
+        $sourceDir = "AdbTools\bin\x64\Release"
+        if (-not (Test-Path $sourceDir)) {
+            Write-Error "❌ Source directory not found: $sourceDir"
+            exit 1
         }
+        
+        Copy-Item -Path "$sourceDir\*" -Destination "artifacts" -Recurse -Force
         
         # 清理不需要的文件
         Remove-Item -Path "artifacts\*.pdb", "artifacts\*.xml", "artifacts\*.vshost.*" -ErrorAction SilentlyContinue
+        
+        # 验证主程序
+        if (-not (Test-Path "artifacts\AdbTools.exe")) {
+            Write-Error "❌ AdbTools.exe not found in artifacts"
+            Get-ChildItem -Path "artifacts"
+            exit 1
+        }
         
         Write-Output "✔️ Artifacts prepared"
       shell: pwsh
