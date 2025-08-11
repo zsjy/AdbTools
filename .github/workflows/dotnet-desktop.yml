@@ -11,8 +11,8 @@ jobs:
       BUILD_PLATFORM: x64
       BUILD_CONFIG: Release
       SOLUTION_PATH: AdbTools.sln
-      PROJECT_PATH: AdbTools/AdbTools.csproj
-      OUTPUT_DIR: bin/x64/Release
+      PROJECT_PATH: AdbTools\AdbTools.csproj
+      OUTPUT_DIR: bin\x64\Release
 
     steps:
     - name: Checkout code
@@ -23,7 +23,9 @@ jobs:
 
     - name: Build solution
       run: |
-        # 清理并构建解决方案
+        Write-Output "Building solution..."
+        
+        # 构建解决方案
         msbuild $env:SOLUTION_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
@@ -33,62 +35,56 @@ jobs:
           /v:diag `
           /flp:LogFile=msbuild.log;Verbosity=diagnostic
         
-        # 打印构建日志
-        type msbuild.log
+        # 显示构建日志
+        Get-Content msbuild.log
         
         # 验证输出目录
-        if not exist "$env:OUTPUT_DIR" (
-          echo "##[error]Build output directory not found at $env:OUTPUT_DIR"
-          echo "##[group]Directory structure"
-          dir /s
-          echo "##[endgroup]"
+        if (-not (Test-Path $env:OUTPUT_DIR)) {
+          Write-Error "Build output directory not found at $env:OUTPUT_DIR"
+          Write-Output "##[group]Directory structure"
+          Get-ChildItem -Recurse
+          Write-Output "##[endgroup]"
           exit 1
-        )
-      shell: cmd
+        }
+      shell: pwsh
 
     - name: Prepare artifacts
       run: |
-        # 确保artifacts目录存在且为空
-        if exist "artifacts" (rmdir /s /q artifacts)
-        mkdir artifacts
+        # 创建artifacts目录
+        if (Test-Path "artifacts") { Remove-Item -Path "artifacts" -Recurse -Force }
+        New-Item -ItemType Directory -Path "artifacts" | Out-Null
         
         # 复制构建输出
-        robocopy "$env:OUTPUT_DIR" "artifacts" /E /NFL /NDL /NJH /NJS /nc /ns /np
+        Copy-Item -Path "$env:OUTPUT_DIR\*" -Destination "artifacts" -Recurse -Force
         
         # 删除不需要的文件
-        powershell -command "
-          Remove-Item -Path 'artifacts\*.pdb' -ErrorAction SilentlyContinue
-          Remove-Item -Path 'artifacts\*.xml' -ErrorAction SilentlyContinue
-          Remove-Item -Path 'artifacts\*.vshost.*' -ErrorAction SilentlyContinue
-        "
-      shell: cmd
+        Remove-Item -Path "artifacts\*.pdb" -ErrorAction SilentlyContinue
+        Remove-Item -Path "artifacts\*.xml" -ErrorAction SilentlyContinue
+        Remove-Item -Path "artifacts\*.vshost.*" -ErrorAction SilentlyContinue
+      shell: pwsh
 
     - name: Create update package
       run: |
         # 检查主程序是否存在
-        if not exist "artifacts\AdbTools.exe" (
-          echo "##[error]AdbTools.exe not found in artifacts directory"
-          dir /s artifacts
+        if (-not (Test-Path "artifacts\AdbTools.exe")) {
+          Write-Error "AdbTools.exe not found in artifacts directory"
+          Get-ChildItem -Path "artifacts" -Recurse
           exit 1
-        )
+        }
         
         # 创建update.zip
-        powershell -command "
-          Compress-Archive -Path 'artifacts\AdbTools.exe' `
-                          -DestinationPath 'artifacts\update.zip' `
-                          -CompressionLevel Optimal
-        "
-      shell: cmd
+        Compress-Archive -Path "artifacts\AdbTools.exe" `
+                         -DestinationPath "artifacts\update.zip" `
+                         -CompressionLevel Optimal
+      shell: pwsh
 
     - name: Create full release package
       run: |
         # 创建完整发布包
-        powershell -command "
-          Get-ChildItem -Path 'artifacts\' -Exclude '*.zip' | 
-          Compress-Archive -DestinationPath 'artifacts\AdbTools.zip' `
+        Get-ChildItem -Path "artifacts\" -Exclude "*.zip" | 
+          Compress-Archive -DestinationPath "artifacts\AdbTools.zip" `
                           -CompressionLevel Optimal -Force
-        "
-      shell: cmd
+      shell: pwsh
 
     - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
