@@ -2,8 +2,7 @@ name: Build and Release x64
 
 on:
   release:
-    types: 
-      - published
+    types: [published]
 
 jobs:
   build-and-release:
@@ -11,6 +10,7 @@ jobs:
     env:
       BUILD_PLATFORM: x64
       BUILD_CONFIG: Release
+      OUTPUT_DIR: bin\x64\Release
 
     steps:
     - name: Checkout code
@@ -19,91 +19,82 @@ jobs:
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v1
-      with:
-        nuget-version: '5.x'
-
-    - name: Restore NuGet packages
-      run: nuget restore AdbTools.sln
-
-    - name: Build x64 Release configuration
+    - name: Build solution with detailed logging
       run: |
+        # 启用详细日志记录
         msbuild AdbTools.sln `
           /p:Configuration=$env:BUILD_CONFIG `
-          /p:Platform="$env:BUILD_PLATFORM" `
-          /p:DeployOnBuild=true `
-          /p:PublishProfile=FolderProfile-x64.pubxml `
-          /p:PlatformTarget=x64
-
-    - name: Verify build output
-      run: |
-        # 使用PowerShell语法检查目录是否存在
-        if (-not (Test-Path "bin\x64\Release")) {
-          Write-Output "Build output directory not found!"
-          Get-ChildItem -Recurse -Path "bin"
+          /p:Platform=$env:BUILD_PLATFORM `
+          /p:PlatformTarget=x64 `
+          /p:OutputPath=$env:OUTPUT_DIR `
+          /v:diag `
+          /flp:LogFile=msbuild.log;Verbosity=diagnostic
+        
+        # 打印构建日志
+        type msbuild.log
+        
+        # 验证输出目录
+        if not exist "$env:OUTPUT_DIR" (
+          echo "##[error]Build output directory not found at $env:OUTPUT_DIR"
+          echo "##[group]Directory structure"
+          dir /s
+          echo "##[endgroup]"
           exit 1
-        }
-      shell: pwsh
-
-    - name: Prepare artifacts directory
-      run: |
-        # 确保artifacts目录存在且为空
-        if exist "artifacts" (rmdir /s /q artifacts)
-        mkdir artifacts
+        )
       shell: cmd
 
-    - name: Copy and filter build outputs
+    - name: Prepare artifacts
       run: |
-        # 使用robocopy复制文件，更可靠
-        robocopy "bin\x64\Release" "artifacts" /E /NFL /NDL /NJH /NJS /nc /ns /np
+        # 创建artifacts目录
+        if not exist "artifacts" mkdir artifacts
         
-        # 使用PowerShell删除不需要的文件
+        # 复制构建输出
+        robocopy "$env:OUTPUT_DIR" "artifacts" /E /NFL /NDL /NJH /NJS /nc /ns /np
+        
+        # 清理不需要的文件
         powershell -command "
           Remove-Item -Path 'artifacts\*.pdb' -ErrorAction SilentlyContinue
           Remove-Item -Path 'artifacts\*.xml' -ErrorAction SilentlyContinue
           Remove-Item -Path 'artifacts\*.vshost.*' -ErrorAction SilentlyContinue
-          Remove-Item -Path 'artifacts\*.config' -ErrorAction SilentlyContinue
         "
       shell: cmd
 
-    - name: Create update.zip (x64)
+    - name: Create update package
       run: |
-        # 使用PowerShell创建zip文件
         powershell -command "
-          if (Test-Path 'artifacts\AdbTools.exe') {
-            Compress-Archive -Path 'artifacts\AdbTools.exe' -DestinationPath 'artifacts\update-x64.zip' -CompressionLevel Optimal
-          } else {
-            Write-Error 'AdbTools.exe not found in artifacts directory!'
+          if (-not (Test-Path 'artifacts\AdbTools.exe')) {
+            Write-Error 'AdbTools.exe not found in artifacts directory'
+            Get-ChildItem -Path 'artifacts'
             exit 1
           }
+          Compress-Archive -Path 'artifacts\AdbTools.exe' -DestinationPath 'artifacts\update.zip' -CompressionLevel Optimal
         "
       shell: cmd
 
-    - name: Create full release package (x64)
+    - name: Create full release package
       run: |
         powershell -command "
           Get-ChildItem -Path 'artifacts\' -Exclude '*.zip' | 
-          Compress-Archive -DestinationPath 'artifacts\full-release-x64.zip' -CompressionLevel Optimal -Force
+          Compress-Archive -DestinationPath 'artifacts\AdbTools.zip' -CompressionLevel Optimal -Force
         "
       shell: cmd
 
-    - name: Upload Update Package
+    - name: Upload Release Assets
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./artifacts/update-x64.zip
+        asset_path: ./artifacts/update.zip
         asset_name: update.zip
         asset_content_type: application/zip
 
-    - name: Upload Full Release Package
+    - name: Upload Full Release
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./artifacts/full-release-x64.zip
+        asset_path: ./artifacts/AdbTools.zip
         asset_name: AdbTools.zip
         asset_content_type: application/zip
