@@ -38,18 +38,20 @@ jobs:
 
     - name: Verify build output
       run: |
-        # 检查构建输出目录是否存在
-        if not exist "bin\x64\Release" (
-          echo "Build output directory not found!"
-          dir /s bin
+        # 使用PowerShell语法检查目录是否存在
+        if (-not (Test-Path "bin\x64\Release")) {
+          Write-Output "Build output directory not found!"
+          Get-ChildItem -Recurse -Path "bin"
           exit 1
-        )
+        }
+      shell: pwsh
 
     - name: Prepare artifacts directory
       run: |
         # 确保artifacts目录存在且为空
         if exist "artifacts" (rmdir /s /q artifacts)
         mkdir artifacts
+      shell: cmd
 
     - name: Copy and filter build outputs
       run: |
@@ -63,18 +65,20 @@ jobs:
           Remove-Item -Path 'artifacts\*.vshost.*' -ErrorAction SilentlyContinue
           Remove-Item -Path 'artifacts\*.config' -ErrorAction SilentlyContinue
         "
+      shell: cmd
 
     - name: Create update.zip (x64)
       run: |
         # 使用PowerShell创建zip文件
         powershell -command "
-          $compress = @{
-            Path = 'artifacts\AdbTools.exe'
-            CompressionLevel = 'Optimal'
-            DestinationPath = 'artifacts\update-x64.zip'
+          if (Test-Path 'artifacts\AdbTools.exe') {
+            Compress-Archive -Path 'artifacts\AdbTools.exe' -DestinationPath 'artifacts\update-x64.zip' -CompressionLevel Optimal
+          } else {
+            Write-Error 'AdbTools.exe not found in artifacts directory!'
+            exit 1
           }
-          Compress-Archive @compress
         "
+      shell: cmd
 
     - name: Create full release package (x64)
       run: |
@@ -82,6 +86,7 @@ jobs:
           Get-ChildItem -Path 'artifacts\' -Exclude '*.zip' | 
           Compress-Archive -DestinationPath 'artifacts\full-release-x64.zip' -CompressionLevel Optimal -Force
         "
+      shell: cmd
 
     - name: Upload Update Package
       uses: actions/upload-release-asset@v1
