@@ -13,6 +13,7 @@ jobs:
       SOLUTION_PATH: AdbTools.sln
       PROJECT_PATH: AdbTools\AdbTools.csproj
       OUTPUT_DIR: bin\x64\Release
+      OBJ_DIR: obj\x64\Release
 
     steps:
     - name: Checkout code
@@ -23,67 +24,71 @@ jobs:
 
     - name: Build solution
       run: |
-        Write-Output "Building solution..."
+        Write-Output "🚀 Building solution (x64 Release)..."
         
-        # 构建解决方案（修正了/flp参数语法）
+        # 静默构建（移除详细日志）
         msbuild $env:SOLUTION_PATH `
           /p:Configuration=$env:BUILD_CONFIG `
           /p:Platform=$env:BUILD_PLATFORM `
           /p:PlatformTarget=x64 `
           /p:OutputPath=$env:OUTPUT_DIR `
           /t:Clean,Build `
-          /v:diag `
-          /flp:"LogFile=msbuild.log;Verbosity=diagnostic"
+          /v:minimal `
+          /nologo
         
-        # 显示构建日志
-        Get-Content msbuild.log
-        
-        # 验证输出目录
-        if (-not (Test-Path $env:OUTPUT_DIR)) {
-          Write-Error "Build output directory not found at $env:OUTPUT_DIR"
-          Write-Output "##[group]Directory structure"
-          Get-ChildItem -Recurse
-          Write-Output "##[endgroup]"
-          exit 1
+        # 检查输出目录
+        $outputPath = if (Test-Path $env:OUTPUT_DIR) { 
+            $env:OUTPUT_DIR 
+        } elseif (Test-Path $env:OBJ_DIR) {
+            Write-Output "ℹ️ Using output from $env:OBJ_DIR"
+            $env:OBJ_DIR
+        } else {
+            Write-Error "❌ Build output not found in either $env:OUTPUT_DIR or $env:OBJ_DIR"
+            exit 1
         }
+        
+        Write-Output "✅ Build successful! Output path: $outputPath"
       shell: pwsh
 
     - name: Prepare artifacts
       run: |
-        # 创建artifacts目录
+        # 确定实际的输出路径
+        $outputPath = if (Test-Path $env:OUTPUT_DIR) { $env:OUTPUT_DIR } else { $env:OBJ_DIR }
+        
+        Write-Output "📦 Preparing artifacts..."
+        
+        # 清理并创建artifacts目录
         if (Test-Path "artifacts") { Remove-Item -Path "artifacts" -Recurse -Force }
         New-Item -ItemType Directory -Path "artifacts" | Out-Null
         
-        # 复制构建输出
-        Copy-Item -Path "$env:OUTPUT_DIR\*" -Destination "artifacts" -Recurse -Force
+        # 复制构建输出（静默模式）
+        Copy-Item -Path "$outputPath\*" -Destination "artifacts" -Recurse -Force
         
-        # 删除不需要的文件
-        Remove-Item -Path "artifacts\*.pdb" -ErrorAction SilentlyContinue
-        Remove-Item -Path "artifacts\*.xml" -ErrorAction SilentlyContinue
-        Remove-Item -Path "artifacts\*.vshost.*" -ErrorAction SilentlyContinue
+        # 清理不需要的文件
+        Remove-Item -Path "artifacts\*.pdb", "artifacts\*.xml", "artifacts\*.vshost.*" -ErrorAction SilentlyContinue
+        
+        # 验证主程序
+        if (-not (Test-Path "artifacts\AdbTools.exe")) {
+            Write-Error "❌ AdbTools.exe not found in artifacts"
+            exit 1
+        }
+        
+        Write-Output "✔️ Artifacts prepared successfully"
       shell: pwsh
 
     - name: Create update package
       run: |
-        # 检查主程序是否存在
-        if (-not (Test-Path "artifacts\AdbTools.exe")) {
-          Write-Error "AdbTools.exe not found in artifacts directory"
-          Get-ChildItem -Path "artifacts" -Recurse
-          exit 1
-        }
-        
-        # 创建update.zip
-        Compress-Archive -Path "artifacts\AdbTools.exe" `
-                         -DestinationPath "artifacts\update.zip" `
-                         -CompressionLevel Optimal
+        Write-Output "🗜 Creating update.zip..."
+        Compress-Archive -Path "artifacts\AdbTools.exe" -DestinationPath "artifacts\update.zip" -CompressionLevel Optimal
+        Write-Output "✔️ Update package created"
       shell: pwsh
 
     - name: Create full release package
       run: |
-        # 创建完整发布包
+        Write-Output "🗜 Creating full release package..."
         Get-ChildItem -Path "artifacts\" -Exclude "*.zip" | 
-          Compress-Archive -DestinationPath "artifacts\AdbTools.zip" `
-                          -CompressionLevel Optimal -Force
+          Compress-Archive -DestinationPath "artifacts\AdbTools.zip" -CompressionLevel Optimal -Force
+        Write-Output "✔️ Full release package created"
       shell: pwsh
 
     - name: Upload Release Assets
