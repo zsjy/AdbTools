@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.34407.143
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35806.99 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdbTools", "AdbTools\AdbTools.csproj", "{D80557CC-6756-4A53-BE06-2A0B21224607}"
-EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AdbToolsSetup", "AdbToolsSetup\AdbToolsSetup.vdproj", "{22559873-B825-4CCF-816B-F0C0BC1FBA06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Update", "Update\Update.csproj", "{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}"
 EndProject
@@ -25,14 +23,6 @@ Global
 		{D80557CC-6756-4A53-BE06-2A0B21224607}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D80557CC-6756-4A53-BE06-2A0B21224607}.Release|x64.ActiveCfg = Release|x64
 		{D80557CC-6756-4A53-BE06-2A0B21224607}.Release|x64.Build.0 = Release|x64
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Debug|Any CPU.ActiveCfg = Debug
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Debug|Any CPU.Build.0 = Debug
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Debug|x64.ActiveCfg = Debug
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Debug|x64.Build.0 = Debug
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|Any CPU.ActiveCfg = Release
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|Any CPU.Build.0 = Release
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|x64.ActiveCfg = Release
-		{22559873-B825-4CCF-816B-F0C0BC1FBA06}.Release|x64.Build.0 = Release
 		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F22C4131-D4CC-426E-8FC4-5C2E60C6B0CE}.Debug|x64.ActiveCfg = Debug|Any CPU
