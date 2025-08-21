@@ -1,0 +1,37 @@
+name: Sync to Gitee
+
+# 显式声明最小化权限
+permissions:
+  contents: write  # 必须的写入权限（用于push）
+  actions: read    # 可选监控权限
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [ closed ]
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  GITEE_REPO: "https://${{ secrets.GITEE_USERNAME }}:${{ secrets.GITEE_TOKEN }}@gitee.com/hcjike/AdbTools.git"
+
+jobs:
+  sync-to-gitee:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # 仅保留必要的写入权限
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror to Gitee
+        run: |
+          git remote add gitee ${{ env.GITEE_REPO }}
+          git push --mirror --force gitee
