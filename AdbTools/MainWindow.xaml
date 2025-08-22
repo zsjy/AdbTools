@@ -77,6 +77,7 @@
                     <Border Background="{Binding ElementName=menuHeader,Path=Background}" Padding="10" CornerRadius="0,0,5,5" BorderBrush="#FF06AB26" BorderThickness="1,0,1,1">
                         <StackPanel Cursor="">
                             <Button x:Name="projectAddress" Content="项目地址" Background="{x:Null}" Click="projectAddress_Click" HorizontalAlignment="Left" Cursor="Hand" FontSize="14"/>
+                            <Button x:Name="projectAddressMirror" Content="项目地址(镜像)" Margin="0,10,0,0" Background="{x:Null}" HorizontalAlignment="Left" Cursor="Hand" FontSize="14" Click="projectAddressMirror_Click"/>
                             <Button x:Name="cheackUpdate" Content="检查更新" Margin="0,10,0,0" Background="{x:Null}" Click="cheackUpdate_Click" HorizontalAlignment="Left" Cursor="Hand" FontSize="14"/>
                         </StackPanel>
                     </Border>
@@ -87,7 +88,8 @@
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="3" Margin="0,0,0,0">
             <Label Content="IP和端口" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" HorizontalAlignment="Left" Width="85"/>
-            <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文【:】连接IP和端口" Margin="100,10,10,0" IsSynchronizedWithCurrentItem="False" Height="30" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" TabIndex="0" >
+            <ComboBox x:Name="deviceAddress" IsEditable="True" ToolTip="示例：192.168.0.1:5555，使用英文【:】连接IP和端口" Margin="100,10,10,0" IsSynchronizedWithCurrentItem="False" Height="30" MaxDropDownHeight="400"
+                      VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" BorderBrush="{x:Null}" Background="{x:Null}" TabIndex="0" >
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" ContextMenu="{StaticResource ComboBoxItemContextMenu}" Cursor="Hand" Margin="0,0,0,0"/>

@@ -10,7 +10,7 @@ namespace AdbTools.bean
         /// <summary>
         /// 发布的名称
         /// </summary>
-        public string Name { get; set; }
+        public string TagName { get; set; }
 
         /// <summary>
         /// 上传构件

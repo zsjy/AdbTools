@@ -512,7 +512,7 @@ namespace AdbTools
             updateVersion.Visibility = Visibility.Visible;
             updateVersion.Tag = githubReleases;
 
-            if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.Name}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.TagName}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 return;
             }
@@ -546,6 +546,13 @@ namespace AdbTools
         {
             about_popup.IsOpen = false;
             CmdExecutor.StartExe("https://github.com/zsjy/AdbTools");
+        }
+
+
+        private void projectAddressMirror_Click(object sender, RoutedEventArgs e)
+        {
+            about_popup.IsOpen = false;
+            CmdExecutor.StartExe("https://gitee.com/hcjike/AdbTools");
         }
 
         private void cheackUpdate_Click(object sender, RoutedEventArgs e)
@@ -778,5 +785,6 @@ namespace AdbTools
             alpsK71V1Window.ShowDialog();
 
         }
+
     }
 }
