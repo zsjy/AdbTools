@@ -17,6 +17,7 @@ on:
 
 env:
   GITEE_REPO: "https://${{ secrets.GITEE_USERNAME }}:${{ secrets.GITEE_TOKEN }}@gitee.com/hcjike/AdbTools.git"
+  GITEA_REPO: "https://${{ secrets.GITEA_USERNAME }}:${{ secrets.GITEA_TOKEN }}@code.hcjike.com/hcjike/AdbTools.git"
 
 jobs:
   sync-to-gitee:
@@ -31,7 +32,36 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Mirror to Gitee
+      - name: Setup Git config
         run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Force mirror to Gitee
+        run: |
+          # 删除所有现有的远程引用（避免引用冲突）
+          git ls-remote --heads ${{ env.GITEE_REPO }} | awk '{print ":"$2}' | xargs -r git push ${{ env.GITEE_REPO }} --delete || true
+          
+          # 添加远程并强制推送所有内容
           git remote add gitee ${{ env.GITEE_REPO }}
-          git push --mirror --force gitee
+          git push gitee --mirror --force
+
+      - name: Force mirror to Gitea
+        run: |
+          # 设置变量
+          GITEA_REPO_URL="${{ env.GITEA_REPO }}"
+          REMOTE_NAME="gitea"  # 使用更具描述性的远程名称
+          
+          # 移除可能已存在的远程
+          git remote remove $REMOTE_NAME 2>/dev/null || true
+          
+          # 添加Gitea远程仓库
+          git remote add $REMOTE_NAME $GITEA_REPO_URL
+          
+          # 删除远程已有的引用（避免冲突）
+          git ls-remote --heads $REMOTE_NAME | awk '{print ":"$2}' | xargs -r git push $REMOTE_NAME --delete 2>/dev/null || true
+          
+          # 强制推送所有内容（镜像推送）
+          git push $REMOTE_NAME --mirror --force
+          
+          echo "Successfully mirrored to Gitea repository"
