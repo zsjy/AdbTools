@@ -786,5 +786,11 @@ namespace AdbTools
 
         }
 
+        private void openShell_Click(object sender, RoutedEventArgs e)
+        {
+            int index = deviceList.SelectedIndex;
+            Device device = deviceAddressList[index];
+            CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {device.DeviceMark} shell ");
+        }
     }
 }

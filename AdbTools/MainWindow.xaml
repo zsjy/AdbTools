@@ -23,6 +23,8 @@
             </MenuItem>
             <Separator  Margin="0,5"/>
             <MenuItem Header="应用控制" Cursor="Hand" Margin="0,2">
+                <MenuItem x:Name="openShell" Header="Shell窗口" Cursor="Hand" Margin="0,2" Click="openShell_Click"/>
+                <Separator  Margin="0,5"/>
                 <MenuItem Header="显示包名" Cursor="Hand" Margin="0,2">
                     <MenuItem x:Name="systemAppPackagep" Header="显示系统应用包名" Cursor="Hand" Margin="0,2" Click="systemAppPackagep_Click"/>
                     <MenuItem x:Name="thirdPartyAppPackage" Header="显示第三方应用包名" Cursor="Hand" Margin="0,2" Click="thirdPartyAppPackage_Click"/>
