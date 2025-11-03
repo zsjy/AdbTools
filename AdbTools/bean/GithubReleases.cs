@@ -7,10 +7,12 @@ namespace AdbTools.bean
 {
     public class GithubReleases
     {
+        public long Id { get; set; }
+
         /// <summary>
         /// 发布的名称
         /// </summary>
-        public string TagName { get; set; }
+        public string tag_name { get; set; }
 
         /// <summary>
         /// 上传构件
@@ -21,6 +23,8 @@ namespace AdbTools.bean
         /// 发布的说明，Markdown
         /// </summary>
         public string Body { get; set; }
+
+        public string created_at { get; set; }
 
     }
 }

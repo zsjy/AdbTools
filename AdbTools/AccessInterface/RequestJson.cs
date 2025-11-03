@@ -42,7 +42,7 @@ namespace AdbTools.AccessInterface
             Thread thread = new Thread(new ThreadStart(() =>
             {
                 GithubReleases githubReleases = Request();
-                if (null == githubReleases || App.Version.Equals(githubReleases.TagName))
+                if (null == githubReleases || App.Version.Equals(githubReleases.tag_name))
                 {
                     return;
                 }
@@ -94,7 +94,8 @@ namespace AdbTools.AccessInterface
 
                 //return responseText;
                 List<GithubReleases> s = jss.Deserialize<List<GithubReleases>>(responseText);
-                return s[0];
+                var sortedReleases = s.OrderByDescending(r => r.Id).ToList();
+                return sortedReleases[0];
             }
             catch (Exception e)
             {

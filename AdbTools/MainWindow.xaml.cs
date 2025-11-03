@@ -512,7 +512,7 @@ namespace AdbTools
             updateVersion.Visibility = Visibility.Visible;
             updateVersion.Tag = githubReleases;
 
-            if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.TagName}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
+            if (MessageBoxResult.OK != MessageBox.Show($"发现新版本【V{githubReleases.tag_name}】是否更新？", "新版本", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
                 return;
             }
