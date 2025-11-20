@@ -967,23 +967,6 @@ namespace AdbTools
                 }
                 return false;
             }, 600);
-            try
-            {
-                // 显示安装中提示
-                // 这里可以添加您的安装逻辑
-
-                string fileName = System.IO.Path.GetFileName(apkFilePath);
-                MessageBox.Show($"开始安装: {fileName}\n目标设备: {targetDevice}",
-                               "安装APK", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // 您的实际安装代码...
-                // InstallApk(apkFilePath, targetDevice);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"安装失败: {ex.Message}", "错误",
-                               MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
     }
 }
