@@ -233,17 +233,18 @@ namespace AdbTools
             pairWindow.ShowDialog();
         }
 
-        private string SelectApkFile()
+        private string[] SelectApkFile()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "APK Files (*.apk)|*.apk";
             openFileDialog.FilterIndex = 1;
+            openFileDialog.Multiselect = true;
             openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() == true)
             {
                 // 获取选中的文件路径
-                return openFileDialog.FileName;
+                return openFileDialog.FileNames;
             }
             return null;
         }
@@ -252,12 +253,12 @@ namespace AdbTools
         {
             int index = deviceList.SelectedIndex;
             Device device = deviceAddressList[index];
-            string path = SelectApkFile();
-            if (string.IsNullOrWhiteSpace(path))
+            string[] path = SelectApkFile();
+            if (null == path || path.Length <= 0)
             {
                 return;
             }
-            HandleApkInstallation(path, device);
+            HandleApkInstallation(new List<string>(path), 0, device);
         }
 
         private void disconnectDeviceItem_Click(object sender, RoutedEventArgs e)
@@ -771,86 +772,24 @@ namespace AdbTools
             CmdExecutor.ExecuteCommandByShell($"{adbPath} -s {device.DeviceMark} shell ");
         }
 
+        private bool dragFilevalid = false;
         private void listBoxItem_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                // 检查是否只有一个文件
-                if (files.Length == 1)
-                {
-                    string filePath = files[0];
-                    bool dir = Directory.Exists(filePath);
-                    string extension = System.IO.Path.GetExtension(filePath).ToLower();
-
-                    // 检查是否为APK文件
-                    if (!dir && ".apk".Equals(extension, StringComparison.OrdinalIgnoreCase))
-                    {
-                        e.Effects = DragDropEffects.Copy;
-                        // APK文件：显示安装提示
-                        if (sender is Grid grid)
-                        {
-                            // 使用半透明背景
-                            grid.Background = new SolidColorBrush(Color.FromArgb(0xa0, 0x00, 0x00, 0x00));
-                            var border = grid.FindName("dragLabel") as Label;
-                            if (border != null)
-                            {
-                                border.Visibility = Visibility.Visible;
-                                border.Content = "松手开始安装";
-                                border.Foreground = Brushes.LightGreen;
-                                border.FontWeight = FontWeights.Bold;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        e.Effects = DragDropEffects.None;
-                        // 非APK文件：显示不支持提示
-                        if (sender is Grid grid)
-                        {
-                            grid.Background = new SolidColorBrush(Color.FromArgb(0xa0, 0x00, 0x00, 0x00));
-                            var border = grid.FindName("dragLabel") as Label;
-                            if (border != null)
-                            {
-                                border.Visibility = Visibility.Visible;
-                                border.Content = $"不支持的类型: {(dir ? "文件夹" : extension.ToUpper())}";
-                                border.Foreground = Brushes.LightCoral;
-                                border.FontWeight = FontWeights.Bold;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    e.Effects = DragDropEffects.None;
-                    // 多个文件：显示不支持提示
-                    if (sender is Grid grid)
-                    {
-                        grid.Background = new SolidColorBrush(Color.FromArgb(0xa0, 0x00, 0x00, 0x00));
-                        var border = grid.FindName("dragLabel") as Label;
-                        if (border != null)
-                        {
-                            border.Visibility = Visibility.Visible;
-                            border.Content = $"只支持单个文件 (当前: {files.Length}个)";
-                            border.Foreground = Brushes.LightCoral;
-                            border.FontWeight = FontWeights.Bold;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-                // 非文件拖拽：显示不支持提示
+                List<string> apkList = GetAllApkFilesFromDrop(e);
+                dragFilevalid = apkList.Count != 0;
+                e.Effects = dragFilevalid ? DragDropEffects.Copy : DragDropEffects.None;
                 if (sender is Grid grid)
                 {
+                    // 使用半透明背景
                     grid.Background = new SolidColorBrush(Color.FromArgb(0xa0, 0x00, 0x00, 0x00));
                     var border = grid.FindName("dragLabel") as Label;
                     if (border != null)
                     {
                         border.Visibility = Visibility.Visible;
-                        border.Content = "请拖放APK文件";
-                        border.Foreground = Brushes.LightCoral;
+                        border.Content = dragFilevalid ? ($"松手{(apkList.Count <= 1 ? "" : "依次")}安装 {apkList.Count} 个文件") : "未检测到有效的“.apk”文件!";
+                        border.Foreground = dragFilevalid ? Brushes.LightGreen : Brushes.LightCoral;
                         border.FontWeight = FontWeights.Bold;
                     }
                 }
@@ -874,34 +813,43 @@ namespace AdbTools
             e.Handled = true;
         }
 
-        private void listBoxItem_DragOver(object sender, DragEventArgs e)
+        private List<string> GetAllApkFilesFromDrop(DragEventArgs e)
         {
+            var apkFiles = new List<string>();
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                foreach (string path in files)
+                {
+                    if (File.Exists(path))
+                    {
+                        if (System.IO.Path.GetExtension(path).Equals(".apk", StringComparison.OrdinalIgnoreCase))
+                        {
+                            apkFiles.Add(path);
+                        }
+                    }
+                    else if (Directory.Exists(path))
+                    {
+                        // 使用 Directory.EnumerateFiles 递归搜索所有.apk文件
+                        try
+                        {
+                            var apksInDirectory = Directory.EnumerateFiles(path, "*.apk",
+                                SearchOption.AllDirectories);
+                            apkFiles.AddRange(apksInDirectory);
+                        }
+                        catch (Exception ex)
+                        {
+                            //MessageBox.Show($"搜索目录 {path} 时出错: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            return apkFiles;
+        }
 
-                // 检查是否只有一个文件且为APK
-                if (files.Length == 1)
-                {
-                    string extension = System.IO.Path.GetExtension(files[0]).ToLower();
-                    if (".apk".Equals(extension, StringComparison.OrdinalIgnoreCase))
-                    {
-                        e.Effects = DragDropEffects.Copy;
-                    }
-                    else
-                    {
-                        e.Effects = DragDropEffects.None;
-                    }
-                }
-                else
-                {
-                    e.Effects = DragDropEffects.None;
-                }
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
+        private void listBoxItem_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = dragFilevalid ? DragDropEffects.Copy : DragDropEffects.None;
             e.Handled = true;
         }
 
@@ -921,31 +869,28 @@ namespace AdbTools
 
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-
-                // 再次验证文件（防止拖拽过程中文件变化）
-                if (files.Length == 1)
+                // 获取对应的数据项
+                Device targetDevice = (Device)((FrameworkElement)sender).DataContext;
+                List<string> apkList = GetAllApkFilesFromDrop(e);
+                if (apkList.Count > 0)
                 {
-                    string filePath = files[0];
-                    string extension = System.IO.Path.GetExtension(filePath).ToLower();
-
-                    if (".apk".Equals(extension, StringComparison.OrdinalIgnoreCase))
-                    {
-                        // 获取对应的数据项
-                        Device targetDevice = (Device)((FrameworkElement)sender).DataContext;
-
-                        // 执行安装逻辑
-                        HandleApkInstallation(filePath, targetDevice);
-                    }
+                    // 执行安装逻辑
+                    HandleApkInstallation(apkList, 0, targetDevice);
                 }
             }
             e.Handled = true;
         }
 
-        private void HandleApkInstallation(string apkFilePath, Device targetDevice)
+        private void HandleApkInstallation(List<string> apkList, int index, Device targetDevice)
         {
+            if (index >= apkList.Count)
+            {
+                return;
+            }
+            string apkFilePath = apkList[index];
             if (MessageBoxResult.OK != MessageBox.Show($"确定要安装应用【{apkFilePath}】到设备【{targetDevice.ShowDeviceName}】吗？", "提示", MessageBoxButton.OKCancel, MessageBoxImage.Question))
             {
+                HandleApkInstallation(apkList, ++index, targetDevice);
                 return;
             }
             waitAnimation(true);
@@ -955,14 +900,19 @@ namespace AdbTools
                 if (!string.IsNullOrWhiteSpace(result) && ContainsAny(result, new string[] { "Success" }))
                 {
                     MessageBox.Show($"设备【{targetDevice.ShowDeviceName}】安装应用成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    HandleApkInstallation(apkList, ++index, targetDevice);
                 }
             },
             err =>
             {
                 waitAnimation(false);
-                if (!string.IsNullOrWhiteSpace(err) && ContainsAny(err, new string[] { "adb: failed to install", "device offline" }))
+                if (!string.IsNullOrWhiteSpace(err) && ContainsAny(err, new string[] { "adb: failed to install", "device offline", "Error: closed" }))
                 {
                     MessageBox.Show($"设备【{targetDevice.ShowDeviceName}】安装应用失败！\r\n1.请确认安卓设备是否允许安装应用；\r\n2.应用签名是否不符；\r\n3.检查设备是否已离线。", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    if (!ContainsAny(err, new string[] { "device offline", "Error: closed" }))
+                    {
+                        HandleApkInstallation(apkList, ++index, targetDevice);
+                    }
                     return true;
                 }
                 return false;
