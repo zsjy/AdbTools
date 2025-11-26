@@ -773,13 +773,20 @@ namespace AdbTools
         }
 
         private bool dragFilevalid = false;
+        private bool exceededMax = false;
+        private int maxFileCount = 1000;
         private void listBoxItem_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                List<string> apkList = GetAllApkFilesFromDrop(e);
-                dragFilevalid = apkList.Count != 0;
-                e.Effects = dragFilevalid ? DragDropEffects.Copy : DragDropEffects.None;
+                Globals.FileCounter.CountFiles((string[])e.Data.GetData(DataFormats.FileDrop), out exceededMax, maxFileCount);
+                List<string> apkList = new List<string>();
+                if (!exceededMax)
+                {
+                    apkList = GetAllApkFilesFromDrop(e);
+                    dragFilevalid = apkList.Count != 0;
+                }
+                e.Effects = dragFilevalid && !exceededMax ? DragDropEffects.Copy : DragDropEffects.None;
                 if (sender is Grid grid)
                 {
                     // 使用半透明背景
@@ -788,7 +795,7 @@ namespace AdbTools
                     if (border != null)
                     {
                         border.Visibility = Visibility.Visible;
-                        border.Content = dragFilevalid ? ($"松手{(apkList.Count <= 1 ? "" : "依次")}安装 {apkList.Count} 个文件") : "未检测到有效的“.apk”文件!";
+                        border.Content = exceededMax ? $"文件过多（超过 {maxFileCount} 个）" : dragFilevalid ? ($"松手{(apkList.Count <= 1 ? "" : "依次")}安装 {apkList.Count} 个文件") : "未检测到有效的“.apk”文件!";
                         border.Foreground = dragFilevalid ? Brushes.LightGreen : Brushes.LightCoral;
                         border.FontWeight = FontWeights.Bold;
                     }
@@ -849,7 +856,7 @@ namespace AdbTools
 
         private void listBoxItem_DragOver(object sender, DragEventArgs e)
         {
-            e.Effects = dragFilevalid ? DragDropEffects.Copy : DragDropEffects.None;
+            e.Effects = !exceededMax && dragFilevalid ? DragDropEffects.Copy : DragDropEffects.None;
             e.Handled = true;
         }
 
@@ -867,7 +874,7 @@ namespace AdbTools
                 }
             }
 
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) && !exceededMax)
             {
                 // 获取对应的数据项
                 Device targetDevice = (Device)((FrameworkElement)sender).DataContext;

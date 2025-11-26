@@ -167,8 +167,145 @@ namespace AdbTools
 
         }
 
+        public static class FileCounter
+        {
+            /// <summary>
+            /// 统计文件数量（包括子文件夹），支持上限控制
+            /// </summary>
+            /// <param name="paths">要统计的路径列表</param>
+            /// <param name="exceededMax">是否超过上限</param>
+            /// <param name="maxCount">最大文件数量上限（默认100）</param>
+            /// <param name="searchPattern">搜索模式（默认"*.*"）</param>
+            /// <param name="includeSubdirectories">是否包含子文件夹（默认true）</param>
+            /// <returns>文件数量</returns>
+            public static int CountFiles(
+                string[] paths,
+                out bool exceededMax,
+                int maxCount = 100,
+                string searchPattern = "*.*",
+                bool includeSubdirectories = true)
+            {
+                exceededMax = false;
 
+                if (paths == null || paths.Length == 0)
+                    return 0;
 
+                int count = 0;
+                var searchOption = includeSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
+                foreach (string path in paths)
+                {
+                    if (count >= maxCount)
+                    {
+                        exceededMax = true;
+                        return maxCount;
+                    }
+
+                    if (File.Exists(path))
+                    {
+                        count++;
+                        if (count >= maxCount)
+                        {
+                            exceededMax = true;
+                            return maxCount;
+                        }
+                    }
+                    else if (Directory.Exists(path))
+                    {
+                        try
+                        {
+                            var files = Directory.EnumerateFiles(path, searchPattern, searchOption);
+                            foreach (var file in files)
+                            {
+                                count++;
+                                if (count >= maxCount)
+                                {
+                                    exceededMax = true;
+                                    return maxCount;
+                                }
+                            }
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            if (includeSubdirectories)
+                            {
+                                count = CountDirectorySafe(path, searchPattern, count, maxCount, out exceededMax);
+                                if (exceededMax) return maxCount;
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    var files = Directory.EnumerateFiles(path, searchPattern, SearchOption.TopDirectoryOnly);
+                                    foreach (var file in files)
+                                    {
+                                        count++;
+                                        if (count >= maxCount)
+                                        {
+                                            exceededMax = true;
+                                            return maxCount;
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                    // 忽略错误
+                                }
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            // 忽略其他错误
+                        }
+                    }
+                }
+
+                exceededMax = count >= maxCount;
+                return count;
+            }
+
+            private static int CountDirectorySafe(string directoryPath, string searchPattern, int currentCount, int maxCount, out bool exceededMax)
+            {
+                exceededMax = false;
+                var stack = new Stack<string>();
+                stack.Push(directoryPath);
+                int count = currentCount;
+
+                while (stack.Count > 0)
+                {
+                    if (count >= maxCount)
+                    {
+                        exceededMax = true;
+                        return maxCount;
+                    }
+
+                    string currentDir = stack.Pop();
+
+                    try
+                    {
+                        foreach (string file in Directory.EnumerateFiles(currentDir, searchPattern, SearchOption.TopDirectoryOnly))
+                        {
+                            count++;
+                            if (count >= maxCount)
+                            {
+                                exceededMax = true;
+                                return maxCount;
+                            }
+                        }
+
+                        foreach (string subDir in Directory.EnumerateDirectories(currentDir))
+                        {
+                            stack.Push(subDir);
+                        }
+                    }
+                    catch
+                    {
+                        // 忽略错误
+                    }
+                }
+
+                return count;
+            }
+        }
     }
 }
